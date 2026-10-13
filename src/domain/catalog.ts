@@ -564,7 +564,9 @@ export function upsertProduct(
         `INSERT INTO products (slug, title, subtitle, description, category_id, brand_line, garment_type, fit, fabric,
               fabric_composition, care, gender, color_family, occasion, price_cents, compare_at_price_cents, currency,
               tax_bps, status, is_sample, sample_note, size_guide_key, published_at, created_at, updated_at)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        /* 25 columns / 25 placeholders: this statement shipped with a 26th `?`, which made
+           every product created from the admin form fail on "26 values for 25 columns". */
         [
           input.slug,
           input.title,
