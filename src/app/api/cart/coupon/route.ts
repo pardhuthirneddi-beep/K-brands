@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { handler, readJson } from '@/lib/api.ts';
 import { ensureDb } from '@/lib/bootstrap.ts';
-import { cartCookieOptions, CART_COOKIE, readCartKey } from '@/lib/session.ts';
+import { cartCookieOptionsFor, CART_COOKIE, readCartKey } from '@/lib/session.ts';
 import { cartKeyFor, quoteCart } from '@/domain/cart.ts';
 import { applyCouponToCart } from '@/domain/pricing.ts';
 import { AppError } from '@/lib/errors.ts';
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       });
       // A guest who has not yet got the cookie still needs it to keep the code.
       if (!user && !(r.headers.get('cookie') ?? '').includes(`${CART_COOKIE}=`)) {
-        out.cookies.set(CART_COOKIE, key, cartCookieOptions);
+        out.cookies.set(CART_COOKIE, key, cartCookieOptionsFor(req));
       }
       return out;
     },

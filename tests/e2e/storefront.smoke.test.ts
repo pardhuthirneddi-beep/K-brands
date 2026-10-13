@@ -126,6 +126,44 @@ test('the login affordance says Login and the tab title is not a route slug', { 
   assert.match(login, /<h1[^>]*>\s*Login/, 'the page must announce itself as Login');
 });
 
+test('the bag takes a real add from a signed-out visitor - the cookie and CSRF chain end to end', { skip: alive ? false : 'no server' }, async () => {
+  const page = await fetch(`${BASE}/product/pure-linen-shirt`);
+  const html = await page.text();
+  // First response must hand out the CSRF cookie, and the write must be able to echo it back. This
+  // chain broke once before, quietly: the cookie was marked Secure on an http deployment, the browser
+  // dropped it, and "Add to bag" answered with a verification error no shopper could act on.
+  const cookies = page.headers.getSetCookie?.() ?? [];
+  const csrf = /kb_csrf=([^;]+)/.exec(cookies.join('; '))?.[1];
+  assert.ok(csrf && csrf.length >= 24, 'a first visit must receive a CSRF cookie');
+
+  const variantId = Number(/variantId\\?":(\d+)/.exec(html)?.[1] ?? 0);
+  assert.ok(variantId > 0, 'the product page must expose a variant the shopper can buy');
+
+  const added = await fetch(`${BASE}/api/cart`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-csrf-token': csrf,
+      cookie: `kb_csrf=${csrf}`,
+      origin: BASE,
+    },
+    body: JSON.stringify({ variantId, quantity: 1 }),
+  });
+  const body = await added.text();
+  assert.equal(added.status, 201, `add to bag should work, saw ${String(added.status)}: ${body.slice(0, 180)}`);
+  assert.match(body, /"quantity":1/, 'the line belongs in the basket');
+
+  // Empty the bag the test filled, using the same session cookies, so repeat runs see the same stock.
+  const jar = (added.headers.getSetCookie?.() ?? [])
+    .map((c) => c.split(';')[0])
+    .concat([`kb_csrf=${csrf}`])
+    .join('; ');
+  await fetch(`${BASE}/api/cart?all=1`, {
+    method: 'DELETE',
+    headers: { 'x-csrf-token': csrf, cookie: jar, origin: BASE },
+  });
+});
+
 test('a broken product URL does not return a plausible-looking empty page', { skip: alive ? false : 'no server' }, async () => {
   const res = await get('/product/this-does-not-exist');
   const html = await res.text();

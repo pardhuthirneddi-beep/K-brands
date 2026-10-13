@@ -47,9 +47,14 @@ export function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const existing = req.cookies.get(CSRF_COOKIE)?.value;
   if (!existing || existing.length < 24) {
+    // The request's own protocol decides `Secure`; the build mode does not. Behind an http tunnel or
+    // preview proxy a Secure-marked cookie is never stored, and every later write then fails its
+    // double-submit check with an error the shopper cannot act on.
+    const proto = req.headers.get('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
+    const https = proto ? proto === 'https' : req.nextUrl.protocol === 'https:';
     res.cookies.set(CSRF_COOKIE, randomToken(), {
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      secure: https,
       path: '/',
       maxAge: 60 * 60 * 24 * 30,
       httpOnly: false,
@@ -64,13 +69,26 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(url, 307);
   }
   const origin = req.headers.get('origin');
-  const host = req.headers.get('host');
-  if (origin && host && req.method !== 'GET' && req.method !== 'HEAD') {
+  if (origin && req.method !== 'GET' && req.method !== 'HEAD') {
+    /*
+     * Same-site check for writes. A reverse proxy normally rewrites Host to the upstream address, so
+     * comparing the browser's origin against Host alone rejects the site's own traffic - in this
+     * preview that is every "Add to bag". Any of the names this deployment is reachable by is
+     * accepted (Host, X-Forwarded-Host), matched without the port because a proxy may drop or add one.
+     * A foreign origin still matches none of them, which is what the check is for.
+     */
+    const host = req.headers.get('host');
+    const forwardedHost = req.headers.get('x-forwarded-host');
+    const known = [host, forwardedHost].filter((v): v is string => Boolean(v));
+    const stripPort = (v: string) => v.replace(/:\d+$/, '');
+    let originHost = '';
     try {
-      if (new URL(origin).host !== host) {
-        return NextResponse.json({ error: 'Cross-origin write blocked.' }, { status: 403 });
-      }
+      originHost = new URL(origin).host;
     } catch {
+      originHost = '';
+    }
+    const sameSite = originHost !== '' && known.some((h) => h === originHost || stripPort(h) === stripPort(originHost));
+    if (!sameSite) {
       return NextResponse.json({ error: 'Cross-origin write blocked.' }, { status: 403 });
     }
   }

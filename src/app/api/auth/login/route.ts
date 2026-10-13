@@ -4,7 +4,7 @@ import { authenticate, createSession } from '@/domain/auth.ts';
 import { recordAudit } from '@/domain/audit.ts';
 import { loginSchema, parseWith } from '@/lib/validation.ts';
 import { AppError } from '@/lib/errors.ts';
-import { SESSION_COOKIE, sessionCookieOptions } from '@/lib/session.ts';
+import { SESSION_COOKIE, cookieOptionsFor } from '@/lib/session.ts';
 import { attachCartUser, mergeCarts } from '@/domain/cart.ts';
 
 export const runtime = 'nodejs';
@@ -52,8 +52,10 @@ export async function POST(req: Request) {
         user: { email: attempt.user.email, fullName: attempt.user.full_name, role: attempt.user.role },
         next: attempt.user.role === 'admin' ? '/admin' : '/account',
       });
-      res.cookies.set(SESSION_COOKIE, session.token, sessionCookieOptions);
-      res.cookies.set('kb_csrf', session.csrfToken, { ...sessionCookieOptions, httpOnly: false });
+      res.cookies.set(SESSION_COOKIE, session.token, cookieOptionsFor(req));
+      // The CSRF cookie must be replaced here, not merely created if absent: it is what the request
+      // is checked against while this session lives, so a stale pre-login value fails every write.
+      res.cookies.set('kb_csrf', session.csrfToken, cookieOptionsFor(req, { httpOnly: false }));
       return res;
     },
   });

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { handler, readJson, readCookie } from '@/lib/api.ts';
 import { ensureDb } from '@/lib/bootstrap.ts';
-import { CART_COOKIE, cartCookieOptions, readCartKey, newCartKey } from '@/lib/session.ts';
+import { CART_COOKIE, cartCookieOptionsFor, readCartKey, newCartKey } from '@/lib/session.ts';
 import {
   addLine,
   cartKeyFor,
@@ -152,7 +152,7 @@ export async function POST(req: Request) {
       const quote = quoteCart({ cartKey: key, userId: user?.id ?? null }).quote;
       const payload = serialize(quote, false);
       const out = NextResponse.json({ ...payload, message: res.message ?? null, quantity: res.quantity }, { status: 201 });
-      if (isNewGuest) out.cookies.set(CART_COOKIE, key, cartCookieOptions);
+      if (isNewGuest) out.cookies.set(CART_COOKIE, key, cartCookieOptionsFor(req));
       return out;
     },
   });

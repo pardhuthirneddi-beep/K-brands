@@ -12,7 +12,7 @@ import { OrderActions } from '@/components/account/order-actions.tsx';
 import { PaymentStatusPanel } from '@/components/account/payment-status.tsx';
 import { eligibilityForOrder } from '@/domain/returns.ts';
 import { trackingForOrder } from '@/adapters/shipping.ts';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import crypto from 'node:crypto';
 import { timingSafeEqualStr } from '@/lib/crypto-utils.ts';
@@ -69,7 +69,9 @@ export async function confirmOrderEmail(formData: FormData) {
     jar.set(ORDER_VIEW_COOKIE, `${String(order.id)}.${String(issuedAt)}.${viewProof(order.id, email, issuedAt)}`, {
       httpOnly: true,
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      // Protocol of the request, not the build: a Secure cookie set over http is silently dropped and
+      // the shopper is asked to confirm the same email again, forever.
+      secure: ((await headers()).get('x-forwarded-proto') ?? (process.env.NODE_ENV === 'production' ? 'https' : 'http')) === 'https',
       path: '/',
       maxAge: VIEW_TTL_SECONDS,
     });

@@ -22,20 +22,45 @@ half-configured gateway cannot accidentally start taking money.
 
 ## 2. Sessions, passwords, CSRF
 
-* Session cookie `kb_session`: `HttpOnly`, `SameSite=Lax`, `Secure` in production, `Path=/`, 14 days
-  (`sessionCookieOptions`). The session token is 32 random bytes (`crypto.randomBytes`); the store
-  keeps only a hash of it, so a database copy does not hand over live sessions.
+* Session cookie `kb_session`: `HttpOnly`, `SameSite=Lax`, `Path=/`, 14 days (`sessionCookieOptions`).
+  The session token is 32 random bytes (`crypto.randomBytes`); the store keeps only a hash of it, so a
+  database copy does not hand over live sessions.
+* **`Secure` is decided per request, not by `NODE_ENV`.** `src/lib/cookie-transport.ts` asks the request
+  (`x-forwarded-proto`, then the URL Next hands the handler, then build mode as the last resort) and sets
+  `Secure` only on an HTTPS origin. The reason is a failure mode worth remembering: a preview served over
+  plain http through a proxy runs a *production* build, so `Secure: NODE_ENV === "production"` made the
+  browser silently discard `kb_session` and `kb_csrf`. Sign-in returned 200 with `Set-Cookie` present and
+  the user still had no session, so every later write — add to bag, address, checkout — came back as
+  *"Your session could not be verified. Sign out and sign in again."* Nothing in the UI was wrong, and the
+  shopper cannot act on that message. `cookieOptionsFor(req)` is now the only writer of these cookie
+  options, and `tests/unit/cookie-transport.test.ts` pins the rule.
+* Sign-in **replaces** `kb_csrf` with the value stored on the new session row. The pre-login token was only
+  ever written by middleware when the cookie was absent, so an existing visitor's cookie could disagree
+  with the freshly created session and `verifyCsrfDoubleSubmit` would reject every write from an account
+  that had just signed in successfully.
 * Passwords: `scrypt` with per-user random salt, `N=16384, r=8, p=1`, 32-byte key, NFKC-normalised
   input, compared in constant time (`src/lib/crypto-utils.ts`). No dependency on a native module.
   A dummy hash is verified on unknown-email lookups so the response time does not reveal accounts.
 * CSRF: double-submit. `src/middleware.ts` guarantees a `kb_csrf` cookie (≥24 random bytes) for every
   visitor, and `handler()` in `src/lib/api.ts` requires the matching `x-csrf-token` header on
-  mutating requests, alongside an `Origin`/`Host` comparison for writes. The CSRF cookie is
-  intentionally readable by JavaScript; the session cookie is not.
+  mutating requests, alongside a same-site check on writes. The CSRF cookie is intentionally readable by
+  JavaScript; the session cookie is not.
+* The same-site check compares the request's `Origin` against `Host` **or `X-Forwarded-Host`** (with the
+  port stripped, because a preview proxy terminates TLS and rewrites the port). `Host` alone is not
+  enough: behind a proxy it is `localhost:3000` while the browser sends the public origin, so the guard
+  refused this site's own same-origin writes — a legitimate add-to-bag came back as 403 *"Cross-origin
+  write blocked."* Anything that is neither origin is still refused.
 * Role checks: `guardAdmin()` (pages use `requireAdminPage`) verifies the session **and** the role on
   the server in every admin handler. `src/domain/auth.ts` documents that the admin role can only be
   granted from the server-side bootstrap env (`KBRANDS_BOOTSTRAP_ADMIN_*`, minimum 14-character
-  password) — no public route, no hidden form field, no default password.
+""  password) — no public route, no hidden form field, no default password.
+* **Demo-only exception:** when `KBRANDS_DEMO_CATALOGUE=1` and `KBRANDS_LIVE_COMMERCE=0`, a visitor can
+  post to `/api/auth/demo-owner` and be signed in as that bootstrap account (see
+  `docs/environment.md`). It reads the credentials from the server environment, authenticates through
+  `authenticate()` like any other sign-in, refuses a non-admin account, is rate limited against the login
+  rule, is audited as `auth.demo_owner_login`, and 404s — as if it did not exist — in any other build.
+  It is a walkthrough convenience, so it is deliberately impossible in a live store rather than something
+  to remember to switch off.
 
 ## 3. Checkout integrity (the part that costs money)
 

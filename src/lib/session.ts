@@ -8,15 +8,18 @@ export const SESSION_COOKIE = 'kb_session';
 export const CART_COOKIE = 'kb_cart';
 export const CSRF_HEADER = 'x-csrf-token';
 
-const secure = process.env.NODE_ENV === 'production';
-
-export const sessionCookieOptions = {
-  httpOnly: true,
-  sameSite: 'lax',
-  secure,
-  path: '/',
-  maxAge: 60 * 60 * 24 * 14,
-} as const;
+/*
+ * Cookie transport rules live in ./cookie-transport.ts so they can be unit-tested without the Next
+ * runtime (this module imports next/headers). Re-exported here because every caller already
+ * imports its cookie options from this file.
+ */
+export {
+  sessionCookieOptions,
+  cartCookieOptions,
+  cookieOptionsFor,
+  cartCookieOptionsFor,
+  requestIsHttps,
+} from './cookie-transport.ts';
 
 /** Read-only cookie access. Writing happens in route handlers (Next constraint). */
 export async function readSessionToken(): Promise<string | null> {
@@ -74,11 +77,3 @@ export async function readCartKey(user: AuthenticatedUser | null): Promise<strin
 export function newCartKey(): string {
   return `guest:${crypto.randomBytes(16).toString('base64url')}`;
 }
-
-export const cartCookieOptions = {
-  httpOnly: true,
-  sameSite: 'lax',
-  secure,
-  path: '/',
-  maxAge: 60 * 60 * 24 * 60,
-} as const;

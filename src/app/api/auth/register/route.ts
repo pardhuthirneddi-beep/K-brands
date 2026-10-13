@@ -4,7 +4,7 @@ import { createSession, registerCustomer } from '@/domain/auth.ts';
 import { recordAudit } from '@/domain/audit.ts';
 import { registerSchema, parseWith } from '@/lib/validation.ts';
 import { AppError } from '@/lib/errors.ts';
-import { cartCookieOptions, SESSION_COOKIE, sessionCookieOptions, newCartKey } from '@/lib/session.ts';
+import { cookieOptionsFor, cartCookieOptionsFor, SESSION_COOKIE, newCartKey } from '@/lib/session.ts';
 import { attachCartUser, mergeCarts } from '@/domain/cart.ts';
 import { consume } from '@/lib/rate-limit.ts';
 import { ipHashFrom } from '@/lib/api.ts';
@@ -48,9 +48,9 @@ export async function POST(req: Request) {
         { ok: true, user: { email: user.email, fullName: user.full_name, role: user.role }, merged },
         { status: 201 },
       );
-      res.cookies.set(SESSION_COOKIE, session.token, sessionCookieOptions);
-      res.cookies.set('kb_csrf', session.csrfToken, { ...sessionCookieOptions, httpOnly: false });
-      if (!merged) res.cookies.set('kb_cart', newCartKey(), cartCookieOptions);
+      res.cookies.set(SESSION_COOKIE, session.token, cookieOptionsFor(req));
+      res.cookies.set('kb_csrf', session.csrfToken, cookieOptionsFor(req, { httpOnly: false }));
+      if (!merged) res.cookies.set('kb_cart', newCartKey(), cartCookieOptionsFor(req));
       return res;
     },
   });
