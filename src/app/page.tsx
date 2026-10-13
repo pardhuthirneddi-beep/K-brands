@@ -97,6 +97,9 @@ export default async function HomePage() {
   const campaignSecondary = linen[1] ?? allRange.items[1] ?? null;
 
   const hero = campaignProduct ?? allRange.items[0] ?? null;
+  // The strapline under the hero name is the owner-editable one from settings, so this
+  // line changes when they approve a new one in /admin/settings — it is not hardcoded copy.
+  const heroProductLabel = (settings.tagline ?? 'Contemporary menswear').replace(/ for the working week$/i, '');
   const heroImage = hero?.primaryImage?.endsWith('.jpg') ? hero.primaryImage : '/media/demo/pure-linen-shirt.jpg';
 
   return (
@@ -105,7 +108,9 @@ export default async function HomePage() {
       <section className="border-b border-line">
         <div className="container grid gap-0 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
           <div className="flex flex-col justify-center py-12 lg:py-24 lg:pr-14">
-            <p className="eyebrow">{settings.tagline ?? 'Premium contemporary menswear'}</p>
+            <p className="eyebrow">
+              {heroProductLabel} · {allRange.total} {allRange.total === 1 ? 'style' : 'styles'} live
+            </p>
             <h1 className="display-hero mt-5 max-w-[15ch]">Clothes for the working week.</h1>
             <p className="mt-6 max-w-[46ch] text-[15.5px] leading-relaxed text-ink-500">
               Linen that behaves in humidity, oxford that survives a commute, poplin that
