@@ -64,7 +64,7 @@ export default async function ReturnsPage() {
                   <p className="font-display text-[17px]">
                     <code className="text-[15px]">{r.reference}</code>
                   </p>
-                  <p className="mt-0.5 text-[12.5px] text-ink-400">
+                  <p className="mt-0.5 text-[12.5px] text-ink-600">
                     For order{' '}
                     <Link href={`/order/${r.order_number}`} className="text-ink underline underline-offset-4">
                       {r.order_number}
@@ -72,7 +72,7 @@ export default async function ReturnsPage() {
                     · {r.type} · {r.reason_code.replace(/_/g, ' ')}
                   </p>
                 </div>
-                <div className="text-right text-[12px] text-ink-400">
+                <div className="text-right text-[12px] text-ink-600">
                   Raised {new Date(r.created_at).toLocaleDateString('en-IN', { dateStyle: 'medium' })}
                   {r.decided_at ? (
                     <br />

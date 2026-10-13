@@ -62,7 +62,7 @@ export default async function AdminCustomersPage({ searchParams }
         <div>
           <p className="eyebrow">People</p>
           <h1 className="font-display text-[27px] leading-tight">Customers</h1>
-          <p className="mt-1 text-[12.5px] text-ink-400">{total.toLocaleString('en-IN')} accounts · guest orders are listed under Orders, not here</p>
+          <p className="mt-1 text-[12.5px] text-ink-600">{total.toLocaleString('en-IN')} accounts · guest orders are listed under Orders, not here</p>
         </div>
         <form method="GET" className="flex items-center gap-2" action="/admin/customers">
           <label className="sr-only" htmlFor="q">Search customers</label>
@@ -73,22 +73,22 @@ export default async function AdminCustomersPage({ searchParams }
 
       <Panel title={`${rows.length} account${rows.length === 1 ? '' : 's'}`} note="Addresses and passwords are never listed here. Password changes and account deletion are self-service, and both revoke every session.">
         {rows.length === 0 ? (
-          <p className="py-8 text-center text-[13px] text-ink-400">No accounts match that search.</p>
+          <p className="py-8 text-center text-[13px] text-ink-600">No accounts match that search.</p>
         ) : (
           <Table head={['Account', 'Contact', 'Role', 'Orders', 'Captured spend', 'Open returns', 'Last seen']}>
             {rows.map((u) => (
               <tr key={u.id} className="align-top">
                 <td className="py-2.5 pr-4">
                   <span className="block font-medium">#{u.id} {u.full_name || '(no name)'}</span>
-                  <span className="mt-0.5 flex flex-wrap items-center gap-2 text-[11.5px] text-ink-400">
+                  <span className="mt-0.5 flex flex-wrap items-center gap-2 text-[11.5px] text-ink-600">
                     joined {u.created_at.slice(0, 10)}
                     <Badge tone={u.email_verified_at ? 'ok' : 'neutral'}>{u.email_verified_at ? 'email verified' : 'email unverified'}</Badge>
                     {u.status !== 'active' ? <Badge tone="error">{u.status}</Badge> : null}
                   </span>
                 </td>
-                <td className="py-2.5 pr-4 text-[12.5px] text-ink-500">
+                <td className="py-2.5 pr-4 text-[12.5px] text-ink-600">
                   {u.email}
-                  {u.phone ? <span className="block text-[11.5px] text-ink-400">{u.phone}</span> : null}
+                  {u.phone ? <span className="block text-[11.5px] text-ink-600">{u.phone}</span> : null}
                 </td>
                 <td className="py-2.5 pr-4">
                   <Badge tone={u.role === 'admin' ? 'ink' : u.role === 'staff' ? 'outline' : 'neutral'}>{u.role}</Badge>
@@ -97,13 +97,13 @@ export default async function AdminCustomersPage({ searchParams }
                   <Link href={`/admin/orders?q=${encodeURIComponent(u.email)}`} className="underline underline-offset-4">
                     {u.orders}
                   </Link>
-                  {u.sample_orders > 0 ? <span className="block text-[11.5px] text-ink-400">{u.sample_orders} sample</span> : null}
+                  {u.sample_orders > 0 ? <span className="block text-[11.5px] text-ink-600">{u.sample_orders} sample</span> : null}
                 </td>
                 <td className="py-2.5 pr-4 tabular-nums">{formatMoney(u.spend_cents, 'INR')}</td>
                 <td className="py-2.5 pr-4">
-                  {u.open_returns > 0 ? <Badge tone="warn">{u.open_returns} open</Badge> : <span className="text-ink-400">—</span>}
+                  {u.open_returns > 0 ? <Badge tone="warn">{u.open_returns} open</Badge> : <span className="text-ink-600">—</span>}
                 </td>
-                <td className="whitespace-nowrap py-2.5 pr-4 text-[12px] text-ink-400">{u.last_login_at ? u.last_login_at.slice(0, 10) : 'never'}</td>
+                <td className="whitespace-nowrap py-2.5 pr-4 text-[12px] text-ink-600">{u.last_login_at ? u.last_login_at.slice(0, 10) : 'never'}</td>
               </tr>
             ))}
           </Table>

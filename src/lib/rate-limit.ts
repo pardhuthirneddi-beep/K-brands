@@ -14,6 +14,9 @@ export const LIMIT_RULES = {
   contact: { bucket: 'contact', limit: 6, windowSeconds: 3600 },
   coupon: { bucket: 'coupon', limit: 20, windowSeconds: 900 },
   checkout: { bucket: 'checkout', limit: 12, windowSeconds: 900 },
+  // A guest confirming the email on an order is allowed a few tries per order, which is what
+  // keeps this page's server action from becoming a place to test address/email pairs.
+  order_verify: { bucket: 'order_verify', limit: 6, windowSeconds: 900 },
   webhook: { bucket: 'webhook', limit: 240, windowSeconds: 60 },
   admin_mutation: { bucket: 'admin', limit: 120, windowSeconds: 60 },
   search: { bucket: 'search', limit: 60, windowSeconds: 60 },

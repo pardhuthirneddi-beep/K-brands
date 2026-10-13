@@ -138,7 +138,7 @@ export default async function AdminSettingsPage() {
             ['NODE_ENV', env.isProduction ? 'production' : 'development'],
           ].map(([k, v]) => (
             <li key={k as string} className="flex items-center justify-between gap-3 border-b border-stone-200 pb-1.5 last:border-0">
-              <code className="text-[11.5px] text-ink-500">{k as string}</code>
+              <code className="text-[11.5px] text-ink-600">{k as string}</code>
               <Badge tone={v === 'missing' ? 'error' : 'neutral'}>{String(v)}</Badge>
             </li>
           ))}

@@ -74,7 +74,7 @@ export function OrderActions({
         </button>
       </div>
       {!signedIn ? (
-        <p className="text-[12px] leading-relaxed text-ink-400">
+        <p className="text-[12px] leading-relaxed text-ink-600">
           Sign in to raise a return so we can verify the order against your account.
         </p>
       ) : null}

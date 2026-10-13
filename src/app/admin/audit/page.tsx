@@ -72,20 +72,20 @@ export default async function AdminAuditPage({
 
       <Panel title={`${rows.length} entr${rows.length === 1 ? 'y' : 'ies'}`}>
         {rows.length === 0 ? (
-          <p className="py-8 text-center text-[13px] text-ink-400">Nothing recorded for this filter.</p>
+          <p className="py-8 text-center text-[13px] text-ink-600">Nothing recorded for this filter.</p>
         ) : (
           <Table head={['When (UTC)', 'Action', 'Actor', 'Target', 'Summary']}>
             {rows.map((r) => (
               <tr key={r.id} className="align-top">
-                <td className="whitespace-nowrap py-2 pr-4 text-[12px] text-ink-400">{r.created_at.slice(0, 19).replace('T', ' ')}</td>
+                <td className="whitespace-nowrap py-2 pr-4 text-[12px] text-ink-600">{r.created_at.slice(0, 19).replace('T', ' ')}</td>
                 <td className="py-2 pr-4">
                   <code className="text-[11.5px] text-ink-600">{r.action}</code>
                 </td>
                 <td className="py-2 pr-4 text-[12.5px]">
-                  {r.actor_email ?? <span className="text-ink-400">system</span>}
+                  {r.actor_email ?? <span className="text-ink-600">system</span>}
                   {r.actor_role ? <Badge tone={r.actor_role === 'customer' ? 'neutral' : 'ink'}>{r.actor_role}</Badge> : null}
                 </td>
-                <td className="py-2 pr-4 text-[12px] text-ink-500">
+                <td className="py-2 pr-4 text-[12px] text-ink-600">
                   {r.target_type}
                   {r.target_id ? (
                     <Link href={`/admin/audit?target=${encodeURIComponent(r.target_id)}`} className="ml-1 font-mono text-[11.5px] underline underline-offset-2">
@@ -95,7 +95,7 @@ export default async function AdminAuditPage({
                 </td>
                 <td className="py-2 pr-4 text-[12.5px] leading-snug text-ink-600">
                   {r.summary}
-                  {r.metadata_json ? <span className="mt-0.5 block max-w-[420px] truncate font-mono text-[11.5px] text-ink-400">{r.metadata_json}</span> : null}
+                  {r.metadata_json ? <span className="mt-0.5 block max-w-[420px] truncate font-mono text-[11.5px] text-ink-600">{r.metadata_json}</span> : null}
                 </td>
               </tr>
             ))}

@@ -128,7 +128,7 @@ export function ProductPurchase({
           </span>
         ) : null}
       </div>
-      {taxNote ? <p className="text-[12px] leading-relaxed text-ink-400">{taxNote}</p> : null}
+      {taxNote ? <p className="text-[12px] leading-relaxed text-ink-600">{taxNote}</p> : null}
 
       {colors.length > 1 ? (
         <fieldset>
@@ -150,7 +150,7 @@ export function ProductPurchase({
                 <span
                   aria-hidden="true"
                   className="inline-block h-4 w-4 rounded-full border border-ink/15"
-                  style={{ background: c.hex ?? '#dedad3' }}
+                  style={{ background: c.hex ?? '#E4E0D9' /* line */ }}
                 />
                 {c.name}
                 {!c.inStock ? <span className="text-[12px] tracking-label text-alert-error">sold out</span> : null}
@@ -164,7 +164,7 @@ export function ProductPurchase({
         <legend className="label flex items-center gap-3">
           Size {size ? <span className="text-ink normal-case tracking-normal">· {size}</span> : null}
           {sizeOptions.some((s) => s.exists && s.available === 0) ? (
-            <span className="text-[12px] tracking-label text-stone-400">grey = sold out</span>
+            <span className="text-[12px] tracking-label text-stone-500">grey = sold out</span>
           ) : null}
         </legend>
         <div className="flex flex-wrap gap-2">
@@ -183,7 +183,7 @@ export function ProductPurchase({
                   ? 'border-ink bg-ink text-ivory-100'
                   : s.exists && s.available > 0
                     ? 'border-stone-300 bg-white hover:border-ink'
-                    : 'cursor-not-allowed border-stone-200 bg-stone-100 text-stone-400 line-through'
+                    : 'cursor-not-allowed border-stone-200 bg-stone-100 text-stone-500 line-through'
               }`}
             >
               {s.size}
@@ -214,12 +214,12 @@ export function ProductPurchase({
               </option>
             ))}
           </select>
-          <p className="text-[12.5px] text-ink-400">
+          <p className="text-[12.5px] text-ink-600">
             {available <= 3 ? `Only ${available} left` : `${available} available`} · SKU {selected.sku}
           </p>
         </div>
       ) : (
-        <p className="text-[12.5px] text-ink-400">Choose a size{colors.length > 1 ? ' and colour' : ''} to see availability.</p>
+        <p className="text-[12.5px] text-ink-600">Choose a size{colors.length > 1 ? ' and colour' : ''} to see availability.</p>
       )}
 
       <button type="button" onClick={add} disabled={!selected || status === 'saving'} className="btn-solid w-full py-3.5">

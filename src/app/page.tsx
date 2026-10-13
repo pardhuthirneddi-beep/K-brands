@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import Link from 'next/link';
 import { ensureDb } from '@/lib/bootstrap.ts';
 import { listCategories, listProducts } from '@/domain/catalog.ts';
@@ -97,6 +99,11 @@ export default async function HomePage() {
   const campaignSecondary = linen[1] ?? allRange.items[1] ?? null;
 
   const hero = campaignProduct ?? allRange.items[0] ?? null;
+  // The campaign band only uses a real file that exists in the repo — never a path that
+  // might 404 — and it degrades to the lead product's own photograph when it is absent.
+  const campaignImage = fs.existsSync(path.join(process.cwd(), 'public/media/demo/hero-editorial.jpg'))
+    ? '/media/demo/hero-editorial.jpg'
+    : null;
   // The strapline under the hero name is the owner-editable one from settings, so this
   // line changes when they approve a new one in /admin/settings — it is not hardcoded copy.
   const heroProductLabel = (settings.tagline ?? 'Contemporary menswear').replace(/ for the working week$/i, '');
@@ -125,7 +132,7 @@ export default async function HomePage() {
                 Explore Shirts
               </Link>
             </div>
-            <p className="mt-10 flex flex-wrap items-center gap-2.5 text-[12.5px] leading-relaxed text-ink-400">
+            <p className="mt-10 flex flex-wrap items-center gap-2.5 text-[12.5px] leading-relaxed text-ink-600">
               <Badge tone="outline">Demo storefront</Badge>
               Catalogue, imagery and prices are development placeholders. No orders are dispatched from this build.
             </p>
@@ -149,7 +156,7 @@ export default async function HomePage() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <figcaption className="absolute bottom-4 left-4 bg-canvas/90 px-2.5 py-1 text-[11.5px] text-ink-500">
+            <figcaption className="absolute bottom-4 left-4 bg-canvas/90 px-2.5 py-1 text-[11.5px] text-ink-600">
               Demo imagery — not product photography
             </figcaption>
             {hero ? (
@@ -194,12 +201,12 @@ export default async function HomePage() {
                 </div>
                 <div className="mt-3.5 flex items-baseline justify-between gap-3 border-t border-line pt-3">
                   <h3 className="font-display text-[17px] leading-snug group-hover:text-ink-500">{t.name}</h3>
-                  <span className="shrink-0 text-[12px] text-ink-400">
+                  <span className="shrink-0 text-[12px] text-ink-600">
                     {t.product_count} {t.product_count === 1 ? 'style' : 'styles'}
                   </span>
                 </div>
                 {t.description ? (
-                  <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-ink-400">{t.description}</p>
+                  <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-ink-600">{t.description}</p>
                 ) : null}
               </Link>
             ))}
@@ -252,16 +259,20 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
-            <figure className="product-frame relative aspect-[4/5] w-full overflow-hidden">
+            <figure className="product-frame relative aspect-[4/5] w-full overflow-hidden lg:aspect-auto lg:min-h-[420px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={campaignProduct.primaryImage ?? `/media/sample/${campaignProduct.slug}/0.svg?garment=shirt`}
-                alt={`Demo visual: ${campaignProduct.title}`}
+                src={campaignImage ?? campaignProduct.primaryImage ?? `/media/sample/${campaignProduct.slug}/0.svg?garment=shirt`}
+                alt={
+                  campaignImage
+                    ? 'Demo campaign image: a man in the linen shirt and stone trousers. Labelled demo imagery.'
+                    : `Demo visual: ${campaignProduct.title}`
+                }
                 loading="lazy"
                 decoding="async"
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover object-top lg:object-cover"
               />
-              <figcaption className="absolute bottom-3 left-3 bg-canvas/90 px-2 py-0.5 text-[11.5px] text-ink-500">
+              <figcaption className="absolute bottom-3 left-3 bg-canvas/90 px-2 py-0.5 text-[11.5px] text-ink-600">
                 Demo imagery
               </figcaption>
             </figure>

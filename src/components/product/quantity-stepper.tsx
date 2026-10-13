@@ -17,7 +17,7 @@ export function QuantityStepper({
   label?: string;
   size?: 'sm' | 'md';
 }) {
-  const dim = size === 'sm' ? 'h-8 w-8' : 'h-10 w-10';
+  const dim = size === 'sm' ? 'h-10 w-10' : 'h-11 w-11';
   return (
     <div className="inline-flex items-center border border-stone-300 bg-white">
       <button

@@ -37,14 +37,14 @@ export default async function ProfilePage() {
           {sessions.map((s, i) => (
             <li key={s.id} className="flex items-center justify-between gap-3 py-2.5">
               <span className="truncate text-ink-600">{s.user_agent?.slice(0, 70) || 'Unknown device'}</span>
-              <span className="shrink-0 text-[12px] text-ink-400">
+              <span className="shrink-0 text-[12px] text-ink-600">
                 {i === 0 ? 'this device · ' : ''}
                 last seen {new Date(s.last_seen_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
               </span>
             </li>
           ))}
         </ul>
-        <p className="mt-2 text-[12px] leading-relaxed text-ink-400">
+        <p className="mt-2 text-[12px] leading-relaxed text-ink-600">
           Sessions expire automatically after 14 days. Changing your password signs out every other device.
         </p>
       </section>

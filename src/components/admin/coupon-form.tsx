@@ -75,7 +75,7 @@ export function CouponForm() {
           <input
             id={`c-${name}`}
             type="checkbox"
-            className="h-4 w-4 accent-[#1a1815]"
+            className="h-4 w-4 accent-ink"
             checked={Boolean(v[name])}
             onChange={(e) => setV((p) => ({ ...p, [name]: e.target.checked }))}
           />
@@ -90,7 +90,7 @@ export function CouponForm() {
           onChange={(e) => setV((p) => ({ ...p, [name]: e.target.value }))}
         />
       )}
-      {errors[name] ? <p className="mt-1 text-[12px] text-alert-error">{errors[name]}</p> : hint ? <p className="mt-1 text-[11.5px] text-ink-400">{hint}</p> : null}
+      {errors[name] ? <p className="mt-1 text-[12px] text-alert-error">{errors[name]}</p> : hint ? <p className="mt-1 text-[11.5px] text-ink-600">{hint}</p> : null}
     </div>
   );
 

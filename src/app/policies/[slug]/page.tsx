@@ -39,7 +39,7 @@ export default async function PolicyPage({ params }: Props) {
   const rendered = renderPolicy(slug);
   return (
     <article className="container max-w-3xl py-12 lg:py-16">
-      <nav aria-label="Breadcrumb" className="mb-6 text-[12px] text-ink-400">
+      <nav aria-label="Breadcrumb" className="mb-6 text-[12px] text-ink-600">
         <Link href="/" className="underline-offset-4 hover:underline">Home</Link> / <span className="text-ink-600">{doc.title}</span>
       </nav>
       <header className="border-b border-stone-200 pb-6">
@@ -51,7 +51,7 @@ export default async function PolicyPage({ params }: Props) {
         <p className="mt-3 text-[14px] leading-relaxed text-ink-500">{doc.summary}</p>
       </header>
       <PolicyBody sections={rendered.sections} requiresReview={rendered.requiresReview} />
-      <footer className="mt-10 border-t border-stone-200 pt-6 text-[12.5px] leading-relaxed text-ink-400">
+      <footer className="mt-10 border-t border-stone-200 pt-6 text-[12.5px] leading-relaxed text-ink-600">
         <p>
           Questions about this page? <Link href="/contact" className="text-ink underline underline-offset-4">Contact us</Link>.
           Other policies:{' '}

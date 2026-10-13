@@ -38,7 +38,7 @@ export function WordmarkLockup({ subtitle = true }: { subtitle?: boolean }) {
     <span className="inline-flex flex-col items-start gap-1">
       <Wordmark size="lg" />
       {subtitle ? (
-        <span className="text-[11.5px] tracking-label text-ink-400">Considered menswear</span>
+        <span className="text-[11.5px] tracking-label text-ink-600">Considered menswear</span>
       ) : null}
     </span>
   );

@@ -190,10 +190,10 @@ export function CartView({
                       <Link href={`/product/${line.slug}`} className="font-display text-[16px] leading-snug hover:underline">
                         {line.title}
                       </Link>
-                      <p className="mt-0.5 text-[12px] text-ink-400">
+                      <p className="mt-0.5 text-[12px] text-ink-600">
                         {[line.size, line.color].filter(Boolean).join(' · ') || 'One size'}
                       </p>
-                      <p className="text-[12px] tracking-label text-stone-400">{line.sku}</p>
+                      <p className="text-[12px] tracking-label text-stone-500">{line.sku}</p>
                     </div>
                     <Price cents={line.lineTotalCents} size="sm" className="shrink-0" />
                   </div>
@@ -214,13 +214,13 @@ export function CartView({
                     <button
                       type="button"
                       onClick={() => void changeQty(line.variantId, 0)}
-                      className="text-[12px] tracking-label text-ink-400 underline-offset-4 hover:text-alert-error hover:underline"
+                      className="text-[12px] tracking-label text-ink-600 underline-offset-4 hover:text-alert-error hover:underline"
                     >
                       Remove
                     </button>
                   </div>
                   {line.isSample ? (
-                    <p className="mt-2 flex items-center gap-2 text-[11.5px] text-ink-500">
+                    <p className="mt-2 flex items-center gap-2 text-[11.5px] text-ink-600">
                       <SampleBadge /> development sample — not real inventory
                     </p>
                   ) : null}
@@ -239,7 +239,7 @@ export function CartView({
                 value={coupon}
                 onChange={(e) => setCoupon(e.target.value.toUpperCase())}
                 placeholder="Discount code"
-                className="field flex-1 py-2 text-[13px] uppercase"
+                className="field flex-1 py-2 text-base uppercase lg:text-[13px]"
                 maxLength={40}
               />
               <button
@@ -265,7 +265,7 @@ export function CartView({
                 label="Delivery"
                 value={
                   quote.shipping?.mode === 'unconfigured' ? (
-                    <span className="text-[12px] text-ink-400">Not configured</span>
+                    <span className="text-[12px] text-ink-600">Not configured</span>
                   ) : (
                     <Price cents={quote.shippingCents} size="sm" />
                   )
@@ -282,7 +282,7 @@ export function CartView({
               </div>
             </dl>
             {quote.taxMode === 'unconfigured' ? (
-              <p className="text-[11.5px] leading-relaxed text-ink-400">
+              <p className="text-[11.5px] leading-relaxed text-ink-600">
                 Taxes shown as “—” until the store’s tax configuration is approved.
               </p>
             ) : null}

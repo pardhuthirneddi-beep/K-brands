@@ -64,7 +64,7 @@ export function ProfileEditor({ initial }: { initial: { fullName: string; phone:
           />
         </div>
       </div>
-      <p className="text-[12px] leading-relaxed text-ink-400">
+      <p className="text-[12px] leading-relaxed text-ink-600">
         Email is <strong className="font-medium text-ink-600">{initial.email}</strong>. Changing the sign-in address
         requires a verification step, which is not part of this build yet.
       </p>

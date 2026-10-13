@@ -46,14 +46,14 @@ export default async function OrdersPage() {
                 <Link href={`/order/${o.order_number}`} className="font-display text-[18px] hover:underline">
                   {o.order_number}
                 </Link>
-                <p className="mt-0.5 text-[12.5px] text-ink-400">
+                <p className="mt-0.5 text-[12.5px] text-ink-600">
                   {new Date(o.created_at).toLocaleDateString('en-IN', { dateStyle: 'long' })} · {o.line_count}{' '}
                   {o.line_count === 1 ? 'item' : 'items'}
                 </p>
               </div>
               <div className="text-right">
                 <p className="text-[15px] tabular-nums">{formatMoney(o.total_cents, o.currency)}</p>
-                <p className="text-[12px] tracking-label text-ink-400">{o.currency}</p>
+                <p className="text-[12px] tracking-label text-ink-600">{o.currency}</p>
               </div>
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-2">

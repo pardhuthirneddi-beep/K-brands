@@ -29,6 +29,16 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    /* The header is sticky, so anchored content and skip-link targets need clearance or
+       the heading hides behind it — the classic "sticky header blocks the page" bug. */
+    scroll-padding-top: 6.5rem;
+  }
+  body {
+    /* Nothing on this site is meant to scroll sideways. `clip` (not `hidden`) stops a
+       stray fixed-width element from creating a horizontal scrollbar on a 360px phone
+       while keeping position:sticky working, which overflow:hidden on an ancestor breaks. */
+    overflow-x: clip;
+    max-width: 100%;
   }
   @media (prefers-reduced-motion: reduce) {
     html {
@@ -85,13 +95,43 @@
     /* Editorial imagery should never look stretched while loading. */
     background-color: #ede9e2;
   }
+  /* Long product titles, order numbers and email addresses are the usual cause of a
+     mobile layout pushing past the viewport. */
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  td,
+  th,
+  label,
+  button,
+  a {
+    overflow-wrap: anywhere;
+  }
+  table {
+    /* Wide admin/account tables scroll inside their own wrapper instead of widening the
+       page; see the .table-scroll helper. */
+    max-width: 100%;
+  }
+  .table-scroll {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  @media (max-width: 400px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
 }
 
 @layer components {
   /* Section eyebrow. Previously 11px uppercase at 0.2em tracking — the loudest, least
      premium thing on the page, repeated ~40 times. Now a quiet medium-case label. */
   .eyebrow {
-    @apply text-[12px] font-medium tracking-label text-ink-500;
+    @apply text-[12px] font-medium tracking-label text-ink-600;
   }
   .display-hero {
     @apply font-display text-[clamp(2.05rem,4.6vw,3.5rem)] leading-[1.04] tracking-hero;
@@ -103,7 +143,7 @@
     @apply font-display text-[1.3rem] leading-[1.2] sm:text-[1.55rem];
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xs px-5 py-2.5 text-[13px] font-medium tracking-[0.01em] transition-all duration-200 ease-editorial disabled:cursor-not-allowed disabled:opacity-45;
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xs px-5 py-2.5 text-[13px] font-medium tracking-[0.01em] transition-all duration-200 ease-editorial disabled:cursor-not-allowed disabled:opacity-45;
   }
   .btn-solid {
     @apply btn bg-ink text-white hover:bg-ink-700 active:translate-y-px;
@@ -114,8 +154,12 @@
   .btn-quiet {
     @apply btn border border-line bg-white/70 text-ink-600 hover:border-ink/25 hover:bg-white hover:text-ink;
   }
+  /*
+   * 16px, not 15px: iOS Safari zooms the whole page when a focused control's text is smaller than
+   * 16px, and a zoomed checkout is a checkout that has to be scrolled sideways to fix.
+   */
   .field {
-    @apply w-full rounded-xs border border-line bg-white px-3.5 py-2.5 text-[15px] text-ink shadow-none outline-none transition placeholder:text-stone-400 focus:border-ink-600 focus:ring-1 focus:ring-ink-600/15 aria-[invalid=true]:border-alert-error;
+    @apply w-full min-h-[46px] max-w-full rounded-xs border border-line bg-white px-3.5 py-2.5 text-[16px] text-ink shadow-none outline-none transition placeholder:text-stone-500 focus:border-ink-600 focus:ring-1 focus:ring-ink-600/15 aria-[invalid=true]:border-alert-error;
   }
   .label {
     @apply mb-1.5 block text-[12px] font-medium text-ink-600;

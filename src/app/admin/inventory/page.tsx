@@ -106,7 +106,7 @@ export default async function AdminInventoryPage({
         note="Availability is stock minus what is reserved by in-flight checkouts. Stock is only consumed when a payment is captured."
       >
         {low.length === 0 ? (
-          <p className="py-6 text-center text-[13px] text-ink-400">Nothing at or below three units.</p>
+          <p className="py-6 text-center text-[13px] text-ink-600">Nothing at or below three units.</p>
         ) : (
           <ul className="space-y-2">
             {low.map((v) => (
@@ -115,7 +115,7 @@ export default async function AdminInventoryPage({
                   <Link href={`/admin/products/${v.slug}`} className="font-medium underline-offset-4 hover:underline">
                     {v.title}
                   </Link>
-                  <span className="ml-2 font-mono text-[11.5px] text-ink-400">{v.sku}</span>
+                  <span className="ml-2 font-mono text-[11.5px] text-ink-600">{v.sku}</span>
                   {v.is_sample === 1 ? <span className="ml-2 align-middle"><SampleBadge /></span> : null}
                 </span>
                 <span className={`tabular-nums ${v.available === 0 ? 'text-alert-error' : 'text-alert-warn'}`}>
@@ -135,11 +135,11 @@ export default async function AdminInventoryPage({
                 <Link href={`/admin/products/${v.slug}`} className="underline-offset-4 hover:underline">
                   {v.title}
                 </Link>
-                <span className="block text-[11.5px] text-ink-400">
+                <span className="block text-[11.5px] text-ink-600">
                   {v.size ?? 'One size'} {v.color_name ? `· ${v.color_name}` : ''}
                 </span>
               </td>
-              <td className="py-2 pr-4 font-mono text-[11.5px] text-ink-500">{v.sku}</td>
+              <td className="py-2 pr-4 font-mono text-[11.5px] text-ink-600">{v.sku}</td>
               <td className="py-2 pr-4 tabular-nums">{v.stock_qty}</td>
               <td className="py-2 pr-4 tabular-nums">{v.reserved_qty}</td>
               <td className={`py-2 pr-4 tabular-nums ${v.available === 0 ? 'text-alert-error' : v.available <= 3 ? 'text-alert-warn' : ''}`}>
@@ -189,14 +189,14 @@ export default async function AdminInventoryPage({
              FROM inventory_ledger l JOIN variants v ON v.id = l.variant_id ORDER BY l.id DESC LIMIT 15`,
           ).map((m, i) => (
             <tr key={i}>
-              <td className="whitespace-nowrap py-2 pr-4 text-[12px] text-ink-400">{String(m.created_at).slice(0, 16).replace('T', ' ')}</td>
+              <td className="whitespace-nowrap py-2 pr-4 text-[12px] text-ink-600">{String(m.created_at).slice(0, 16).replace('T', ' ')}</td>
               <td className="py-2 pr-4 font-mono text-[11.5px]">{m.sku}</td>
               <td className={`py-2 pr-4 tabular-nums ${m.change_qty < 0 ? 'text-alert-error' : 'text-alert-ok'}`}>
                 {m.change_qty > 0 ? `+${m.change_qty}` : m.change_qty}
               </td>
               <td className="py-2 pr-4 tabular-nums">{m.balance_after}</td>
               <td className="py-2 pr-4 text-[12px]">{m.reason}</td>
-              <td className="max-w-[240px] truncate py-2 pr-4 text-[12px] text-ink-400">{m.note ?? '—'}</td>
+              <td className="max-w-[240px] truncate py-2 pr-4 text-[12px] text-ink-600">{m.note ?? '—'}</td>
             </tr>
           ))}
         </Table>

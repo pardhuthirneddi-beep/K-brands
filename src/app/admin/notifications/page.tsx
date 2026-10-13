@@ -56,7 +56,7 @@ export default async function AdminNotificationsPage() {
         <Panel title="Transport">
           <p className="flex items-center gap-2 text-[13px]">
             <Badge tone={emailTransportReady() ? 'ok' : 'warn'}>{emailTransportReady() ? `live (${env.emailMode})` : 'not configured'}</Badge>
-            <span className="text-ink-400">{env.emailFrom}</span>
+            <span className="text-ink-600">{env.emailFrom}</span>
           </p>
           <p className="mt-2 text-[12px] leading-relaxed text-ink-500">
             {emailTransportReady()
@@ -72,7 +72,7 @@ export default async function AdminNotificationsPage() {
                 <span className="tabular-nums">{v}</span>
               </li>
             ))}
-            {Object.keys(stats).length === 0 ? <li className="text-ink-400">Empty.</li> : null}
+            {Object.keys(stats).length === 0 ? <li className="text-ink-600">Empty.</li> : null}
             {failures > 0 ? <li className="pt-1 text-alert-error">{failures} failed — see the error column below</li> : null}
           </ul>
         </Panel>
@@ -80,22 +80,22 @@ export default async function AdminNotificationsPage() {
 
       <Panel title="Recent queue rows" note="Recipient addresses are stored as supplied; nothing here is echoed back to a browser beyond this admin page.">
         {rows.length === 0 ? (
-          <p className="py-8 text-center text-[13px] text-ink-400">Nothing has been queued yet. Place an order to generate one.</p>
+          <p className="py-8 text-center text-[13px] text-ink-600">Nothing has been queued yet. Place an order to generate one.</p>
         ) : (
           <Table head={['When', 'Template', 'Recipient', 'Subject', 'Status', 'Ref', 'Attempts / error']}>
             {rows.map((n) => (
               <tr key={n.id} className="align-top">
-                <td className="whitespace-nowrap py-2 pr-4 text-[12px] text-ink-400">{n.created_at.slice(5, 16).replace('T', ' ')}</td>
+                <td className="whitespace-nowrap py-2 pr-4 text-[12px] text-ink-600">{n.created_at.slice(5, 16).replace('T', ' ')}</td>
                 <td className="py-2 pr-4 font-mono text-[11.5px]">{n.template}</td>
-                <td className="max-w-[180px] truncate py-2 pr-4 text-[12.5px] text-ink-500">{n.recipient}</td>
+                <td className="max-w-[180px] truncate py-2 pr-4 text-[12.5px] text-ink-600">{n.recipient}</td>
                 <td className="max-w-[240px] truncate py-2 pr-4 text-[12.5px]">{n.subject}</td>
                 <td className="py-2 pr-4">
                   <Badge tone={n.status === 'sent' ? 'ok' : n.status === 'failed' ? 'error' : n.status === 'queued' ? 'warn' : 'neutral'}>
                     {n.status.replace(/_/g, ' ')}
                   </Badge>
                 </td>
-                <td className="py-2 pr-4 text-[12px] text-ink-400">{n.related_id ?? '—'}</td>
-                <td className="py-2 pr-4 text-[12px] text-ink-500">
+                <td className="py-2 pr-4 text-[12px] text-ink-600">{n.related_id ?? '—'}</td>
+                <td className="py-2 pr-4 text-[12px] text-ink-600">
                   {n.attempts} attempt{n.attempts === 1 ? '' : 's'}
                   {n.last_error ? <span className="block text-[11.5px] text-alert-error">{n.last_error}</span> : null}
                   {n.sent_at ? <span className="block text-[11.5px] text-alert-ok">sent {n.sent_at.slice(5, 16).replace('T', ' ')}</span> : null}

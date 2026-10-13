@@ -14,7 +14,7 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-start gap-3 border border-dashed border-stone-300 bg-white/50 px-6 py-10 text-left">
-      <span aria-hidden="true" className="text-[22px] leading-none text-stone-400">
+      <span aria-hidden="true" className="text-[22px] leading-none text-stone-500">
         {icon}
       </span>
       <h3 className="font-display text-[22px] leading-tight">{title}</h3>
@@ -44,7 +44,7 @@ export function LoadingRows({ rows = 6 }: { rows?: number }) {
 
 export function InlineLoading({ label }: { label: string }) {
   return (
-    <div className="flex items-center justify-center gap-3 py-10 text-ink-400">
+    <div className="flex items-center justify-center gap-3 py-10 text-ink-600">
       <Spinner label={label} />
     </div>
   );

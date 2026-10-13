@@ -91,7 +91,7 @@ export default async function AdminDashboard() {
           }
         >
           {recent.length === 0 ? (
-            <p className="py-6 text-center text-[13px] text-ink-400">
+            <p className="py-6 text-center text-[13px] text-ink-600">
               No orders yet. Place a sandbox order from the storefront to exercise the full flow.
             </p>
           ) : (
@@ -122,14 +122,14 @@ export default async function AdminDashboard() {
 
         <Panel title="Low stock" action={<Link href="/admin/inventory" className="text-[12px] uppercase tracking-widest text-ink-500 hover:text-ink">Manage</Link>}>
           {low.length === 0 ? (
-            <p className="py-6 text-center text-[13px] text-ink-400">Every variant has stock above the alert level.</p>
+            <p className="py-6 text-center text-[13px] text-ink-600">Every variant has stock above the alert level.</p>
           ) : (
             <ul className="space-y-2.5">
               {low.map((v) => (
                 <li key={v.variant_id} className="flex items-center justify-between gap-3 text-[13px]">
                   <span className="min-w-0">
                     <span className="block truncate">{v.title}</span>
-                    <span className="text-[11.5px] text-ink-400">
+                    <span className="text-[11.5px] text-ink-600">
                       {v.size ?? 'One size'} · variant #{v.variant_id}
                     </span>
                   </span>
@@ -182,7 +182,7 @@ export default async function AdminDashboard() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[12px] leading-relaxed text-ink-400">
+          <p className="mt-3 text-[12px] leading-relaxed text-ink-600">
             Notification queue: {Object.entries(notifications).map(([k, v]) => `${v} ${k}`).join(' · ') || 'empty'}. Nothing
             has been delivered unless a transport is configured.
           </p>

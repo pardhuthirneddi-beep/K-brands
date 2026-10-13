@@ -153,7 +153,7 @@ export function AddressBook({ initial }: { initial: Address[] }) {
               {a.locality ? `${a.locality}, ` : ''}
               {a.city}, {a.state_name} {a.pincode}
             </address>
-            <p className="mt-1 text-[12px] text-ink-400">{a.phone}</p>
+            <p className="mt-1 text-[12px] text-ink-600">{a.phone}</p>
             <div className="mt-3 flex flex-wrap gap-3 text-[12px] uppercase tracking-widest">
               <button type="button" onClick={() => start(a)} className="text-ink-500 underline-offset-4 hover:underline">
                 Edit
@@ -216,7 +216,7 @@ export function AddressBook({ initial }: { initial: Address[] }) {
               error={errors.pincode}
             />
           </div>
-          <p className="mt-3 text-[12px] leading-relaxed text-ink-400">
+          <p className="mt-3 text-[12px] leading-relaxed text-ink-600">
             Only India addresses are accepted while the store is India-first.
           </p>
           <div className="mt-4 flex gap-2.5">

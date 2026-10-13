@@ -31,7 +31,7 @@ export default async function AdminProductsPage({
         <div>
           <p className="eyebrow">Catalogue</p>
           <h1 className="font-display text-[27px] leading-tight">Products</h1>
-          <p className="mt-1 text-[12.5px] text-ink-400">
+          <p className="mt-1 text-[12.5px] text-ink-600">
             {total.toLocaleString('en-IN')} records · every sample record is marked, and the storefront shows that mark to visitors too.
           </p>
         </div>
@@ -61,7 +61,7 @@ export default async function AdminProductsPage({
 
       <Panel title={`${rows.length} record${rows.length === 1 ? '' : 's'}`}>
         {rows.length === 0 ? (
-          <p className="py-8 text-center text-[13px] text-ink-400">
+          <p className="py-8 text-center text-[13px] text-ink-600">
             Nothing here yet. Run <code className="text-ink-600">npm run db:seed-demo</code> for sample records, or create one.
           </p>
         ) : (
@@ -72,7 +72,7 @@ export default async function AdminProductsPage({
                   <Link href={`/admin/products/${p.slug}`} className="font-medium underline-offset-4 hover:underline">
                     {p.title}
                   </Link>
-                  <span className="mt-0.5 block text-[11.5px] text-ink-400">
+                  <span className="mt-0.5 block text-[11.5px] text-ink-600">
                     /{p.slug} · {p.category_slug ?? 'uncategorised'}
                   </span>
                   {p.is_sample === 1 ? (

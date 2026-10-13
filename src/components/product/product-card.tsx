@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Price } from '../ui/price.tsx';
 import { Badge, SampleBadge } from '../ui/badge.tsx';
@@ -29,28 +30,44 @@ export function ProductCard({
   const [quick, setQuick] = useState(false);
   const fallback = `/media/sample/${product.slug}/0.svg?garment=${encodeURIComponent(product.garment_type ?? 'shirt')}`;
   const colors = product.colors ?? [];
+  const isPhoto = (src ?? fallback).match(/\.(jpg|jpeg|png|webp)$/i) !== null;
   const shown = colors.slice(0, 4);
   const extra = colors.length - shown.length;
 
   return (
-    <article className="group relative flex flex-col">
+    <article className="group relative flex min-w-0 flex-col">
       <Link
         href={`/product/${product.slug}`}
         className="block overflow-hidden"
         aria-label={`${product.title}, ${product.availableUnits > 0 ? 'view product' : 'sold out'}`}
       >
         <div className="product-frame relative aspect-[3/4] w-full overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={src ?? fallback}
-            alt={`${product.title} — demo visual, not product photography`}
-            width={900}
-            height={1200}
-            loading={priority ? 'eager' : 'lazy'}
-            decoding="async"
-            onError={() => setSrc(fallback)}
-            className="h-full w-full object-cover transition-transform duration-700 ease-editorial group-hover:scale-[1.03]"
-          />
+          {isPhoto ? (
+            <Image
+              src={src ?? fallback}
+              alt={`${product.title} — demo photograph of the ${product.color_family ?? 'men’s'} garment, not verified product photography`}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 24vw"
+              priority={priority}
+              loading={priority ? 'eager' : 'lazy'}
+              onError={() => setSrc(fallback)}
+              className="h-full w-full object-cover transition-transform duration-700 ease-editorial group-hover:scale-[1.03]"
+            />
+          ) : (
+            // Illustration plates are vector and carry a query string, so the optimiser is
+            // skipped rather than pointed at a URL it cannot resize.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={src ?? fallback}
+              alt={`${product.title} — demo illustration, not product photography`}
+              width={900}
+              height={1200}
+              loading={priority ? 'eager' : 'lazy'}
+              decoding="async"
+              onError={() => setSrc(fallback)}
+              className="h-full w-full object-cover transition-transform duration-700 ease-editorial group-hover:scale-[1.03]"
+            />
+          )}
           <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
             {product.isSample ? <SampleBadge note={product.sample_note} label="Demo" /> : null}
             {product.savingsPercent ? <Badge tone="ink">−{product.savingsPercent}%</Badge> : null}
@@ -71,11 +88,14 @@ export function ProductCard({
           </Link>
         </h3>
         {product.subtitle && !compact ? (
-          <p className="line-clamp-1 text-[12.5px] text-ink-400">{product.subtitle}</p>
+          <p className="line-clamp-1 text-[12.5px] text-ink-600">{product.subtitle}</p>
         ) : null}
 
         {shown.length > 0 ? (
-          <div className="mt-1.5 flex items-center gap-1.5" aria-label={`${String(colors.length)} colourways`}>
+          <div
+            className="mt-1.5 flex min-w-0 items-center gap-1.5"
+            aria-label={`${String(colors.length)} ${colors.length === 1 ? 'colourway' : 'colourways'}, each photographed`}
+          >
             {shown.map((c) => (
               <span
                 key={c.name}
@@ -84,7 +104,7 @@ export function ProductCard({
                 style={{ backgroundColor: c.hex ?? '#EDE9E2' }}
               />
             ))}
-            {extra > 0 ? <span className="text-[11.5px] text-ink-400">+{extra}</span> : null}
+            {extra > 0 ? <span className="text-[11.5px] text-ink-600">+{extra}</span> : null}
           </div>
         ) : null}
 
@@ -92,13 +112,13 @@ export function ProductCard({
           <div>
             <Price cents={product.priceCents} compareAt={product.compare_at_price_cents} size="sm" />
             {product.availableUnits > 0 && product.availableUnits <= 4 ? (
-              <p className="mt-0.5 text-[11.5px] text-ink-400">{product.availableUnits} left in stock (demo count)</p>
+              <p className="mt-0.5 text-[11.5px] text-ink-600">{product.availableUnits} left in stock (demo count)</p>
             ) : null}
           </div>
           <button
             type="button"
             onClick={() => setQuick(true)}
-            className="btn-quiet relative z-10 px-3 py-1.5 text-[12px] opacity-0 transition group-hover:opacity-100 focus-visible:opacity-100 lg:opacity-0"
+            className="btn-quiet relative z-10 px-3 py-1.5 text-[12px] opacity-100 transition focus-visible:opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
           >
             Quick view
           </button>
@@ -125,15 +145,15 @@ export function ProductCard({
                 {colors.length > 0 ? (
                   <dl className="mt-4 space-y-1.5 text-[12.5px]">
                     <div className="flex gap-3">
-                      <dt className="w-20 shrink-0 text-ink-400">Colours</dt>
+                      <dt className="w-20 shrink-0 text-ink-600">Colours</dt>
                       <dd className="text-ink-600">{colors.map((c) => c.name).join(', ')}</dd>
                     </div>
                     <div className="flex gap-3">
-                      <dt className="w-20 shrink-0 text-ink-400">Fabric</dt>
+                      <dt className="w-20 shrink-0 text-ink-600">Fabric</dt>
                       <dd className="text-ink-600">{product.fabric ?? 'To be confirmed'}</dd>
                     </div>
                     <div className="flex gap-3">
-                      <dt className="w-20 shrink-0 text-ink-400">Availability</dt>
+                      <dt className="w-20 shrink-0 text-ink-600">Availability</dt>
                       <dd className="text-ink-600">
                         {product.availableUnits > 0
                           ? `${product.availableUnits} units across ${product.variantCount} size/colour combinations`
@@ -155,7 +175,7 @@ export function ProductCard({
                     </button>
                   </Dialog.Close>
                 </div>
-                <p className="mt-4 text-[11.5px] leading-relaxed text-ink-400">
+                <p className="mt-4 text-[11.5px] leading-relaxed text-ink-600">
                   Demo record — imagery, price and stock are placeholders for development.
                 </p>
               </div>

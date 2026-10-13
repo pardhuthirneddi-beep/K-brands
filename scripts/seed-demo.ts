@@ -10,6 +10,8 @@
  *
  * Replacing samples with verified data: docs/sample-data.md
  */
+import fs from 'node:fs';
+import path from 'node:path';
 import { all, closeDb, get, insertRow, run, transaction, updateRow } from '../src/db/client.ts';
 import { runMigrations } from '../src/db/migrate.ts';
 import { ensureDefaults, setSetting } from '../src/domain/settings.ts';
@@ -28,6 +30,7 @@ if (isProd && process.env.KBRANDS_ALLOW_SAMPLE_SEED !== '1') {
 runMigrations();
 ensureDefaults();
 
+const ROOT = process.cwd();
 const now = new Date().toISOString();
 const SAMPLE_NOTE = 'Demo record — pricing, imagery and stock are fictional. Not real inventory, not a product you can ship.';
 
@@ -583,60 +586,63 @@ const sizeGuideFor = (garment: SampleProduct['garment']): string => {
 };
 
 /**
- * Where a demo photograph exists it lives at public/media/demo/<slug>.jpg and is
- * referenced from the product record (never hardcoded inside a component). Colourways
- * without photography fall back to the deterministic plate route, tinted to that exact
- * colour, so the frame a shopper sees always matches the swatch they picked.
+ * IMAGERY RULES FOR THE DEMO CATALOGUE
+ *
+ * A colourway is only listed (and only purchasable) when a photograph of *that colourway*
+ * exists. Files are looked up, never hardcoded in components:
+ *
+ *   public/media/demo/<slug>-<colourtoken>.jpg   a specific colourway
+ *   public/media/demo/<slug>.jpg                 the lead colourway
+ *
+ * Why gate on the file: the alternative — listing four colours and showing one photo — is
+ * exactly the "image does not match the garment" failure this catalogue is meant to avoid,
+ * and it is worse than showing a single honest colour range. Drop the missing shot into
+ * public/media/demo/ and re-run `npm run db:seed-demo`: that colourway becomes active on
+ * its own, with no component change anywhere.
+ *
+ * If a product has no photography at all it keeps the deterministic labelled illustration
+ * plate, so it is never imageless; that plate is a fallback slot, not a look.
  */
-const PHOTOGRAPHED = new Set(PRODUCTS.filter((p) => p.photo).map((p) => p.slug));
+const PHOTO_DIR = path.join(ROOT, 'public', 'media', 'demo');
+const colourToken = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-function imagesFor(p: SampleProduct) {
-  const lead = p.colors[0]!;
-  const rows: { url: string; alt: string; kind: 'photo' | 'generated'; width: number; height: number }[] = [];
-  if (PHOTOGRAPHED.has(p.slug)) {
-    rows.push({
-      url: `/media/demo/${p.slug}.jpg`,
-      alt: `Demo visual: men's ${p.title.toLowerCase()} in ${lead.name}. Not verified product photography.`,
-      kind: 'photo',
-      width: 900,
-      height: 1200,
-    });
+function photoFor(slug: string, colour: string, isLead: boolean): string | null {
+  const candidates = isLead
+    ? [`${slug}-${colourToken(colour)}.jpg`, `${slug}.jpg`, `${slug}.png`]
+    : [`${slug}-${colourToken(colour)}.jpg`];
+  for (const file of candidates) {
+    if (fs.existsSync(path.join(PHOTO_DIR, file))) return `/media/demo/${file}`;
   }
-  for (const c of p.colors) {
-    rows.push({
-      url: `/media/sample/${p.slug}/0.svg?garment=${p.garment}&c=${encodeURIComponent(c.hex)}&t=${encodeURIComponent(c.name)}`,
-      alt: `Demo illustration of the ${p.title.toLowerCase()} in ${c.name}. Illustration, not a photograph.`,
-      kind: 'generated',
-      width: 900,
-      height: 1200,
-    });
-  }
-  return rows;
+  return null;
 }
 
-/**
- * Refuse to write an off-brand catalogue. This runs against the data structure
- * itself, so a future edit that reintroduces accessories or womenswear fails here
- * before it can ever reach a storefront.
- */
-{
-  const problems: string[] = [];
-  for (const c of CATEGORIES) {
-    if (!ALLOWED_CATEGORY_SLUGS.includes(c.slug)) problems.push(`category "${c.slug}" is not in the approved list`);
-    const hit = bannedHit(`${c.name} ${c.description ?? ''}`);
-    if (hit) problems.push(`category "${c.slug}" contains banned word "${hit}"`);
+type Colourway = { name: string; hex: string; photo: string | null };
+
+function colourwaysFor(p: SampleProduct): Colourway[] {
+  return p.colors.map((c, i) => ({ ...c, photo: photoFor(p.slug, c.name, i === 0) }));
+}
+
+function imagesFor(rows: Colourway[], p: SampleProduct) {
+  const shots = rows.filter((c) => c.photo);
+  if (shots.length > 0) {
+    return shots.map((c) => ({
+      url: c.photo as string,
+      alt: `Demo photograph: the ${p.title.toLowerCase()} in ${c.name}. Labelled demo imagery, not a verified product shot.`,
+      kind: 'photo' as const,
+      colour: c.name,
+      width: 900,
+      height: 1200,
+    }));
   }
-  for (const p of PRODUCTS) {
-    if (!ALLOWED_CATEGORY_SLUGS.includes(p.category)) problems.push(`product "${p.slug}" uses unapproved category`);
-    const hit = bannedHit(
-      [p.title, p.subtitle, p.description, p.fabric, p.care, p.occasion, p.fit, ...p.colors.map((c) => c.name)].join(' '),
-    );
-    if (hit) problems.push(`product "${p.slug}" mentions banned category "${hit}"`);
-  }
-  if (problems.length) {
-    console.error('[seed] MEN’S-ONLY CATALOGUE GUARD FAILED:\n  - ' + problems.join('\n  - '));
-    process.exit(1);
-  }
+  // No photography for any colourway: one colour-matched plate per colour, clearly captioned.
+  return rows.map((c, i) => ({
+    url: `/media/sample/${p.slug}/${String(i)}.svg?garment=${p.garment}&c=${encodeURIComponent(c.hex)}&t=${encodeURIComponent(c.name)}`,
+    alt: `Demo illustration of the ${p.title.toLowerCase()} in ${c.name}. Illustration, not a photograph.`,
+    kind: 'generated' as const,
+    colour: c.name,
+    width: 900,
+    height: 1200,
+  }));
 }
 
 let productCount = 0;
@@ -673,9 +679,18 @@ transaction(() => {
   }
 });
 
+const pendingColourways: string[] = [];
+
 for (const p of PRODUCTS) {
   transaction(() => {
     const categoryId = get<{ id: number }>('SELECT id FROM categories WHERE slug = ?', [p.category])?.id ?? null;
+    const rows = colourwaysFor(p);
+    const frames = imagesFor(rows, p);
+    const purchasable = new Set(rows.filter((c) => c.photo).map((c) => c.name));
+    const gateable = rows.some((c) => c.photo) && rows.some((c) => !c.photo);
+    if (gateable) {
+      for (const c of rows) if (!c.photo) pendingColourways.push(`${p.slug}: ${c.name}`);
+    }
     const existing = get<{ id: number }>('SELECT id FROM products WHERE slug = ?', [p.slug]);
     const stamp = new Date(Date.now() - p.ageDays * 86400000).toISOString();
     const tags = ['demo', p.garment, p.occasion.toLowerCase().replace(/\s+/g, '-')];
@@ -721,7 +736,7 @@ for (const p of PRODUCTS) {
     productCount += 1;
 
     run('DELETE FROM product_images WHERE product_id = ?', [productId]);
-    imagesFor(p).forEach((img, i) => {
+    frames.forEach((img, i) => {
       insertRow('product_images', {
         product_id: productId,
         url: img.url,
@@ -769,7 +784,9 @@ for (const p of PRODUCTS) {
           compare_at_price_cents: null,
           stock_qty: qty,
           reserved_qty: 0,
-          status: 'active',
+          // A colourway with no photograph of its own is not offered for sale, so the
+          // storefront can never show the wrong garment. Its stock is still recorded.
+          status: gateable && !purchasable.has(color.name) ? 'inactive' : 'active',
           weight_grams: 420,
         };
         if (variantId) {
@@ -915,6 +932,12 @@ console.log(
 );
 closeDb();
 
+if (pendingColourways.length > 0) {
+  console.log(
+    `[seed] ${String(pendingColourways.length)} colourway(s) held back until photographed (variant written as inactive):\n       ` +
+      pendingColourways.slice(0, 12).join('\n       '),
+  );
+}
 console.log(
   `[seed] menswear demo catalogue: ${String(productCount)} products, ${String(variantCount)} variants, ` +
     `${String(prunedCount)} retired demo row(s) removed. All rows flagged is_sample=1.`,

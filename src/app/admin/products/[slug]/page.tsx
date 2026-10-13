@@ -36,11 +36,11 @@ export default async function AdminProductPage({ params }
     <div className="space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href="/admin/products" className="text-[12px] uppercase tracking-widest text-ink-400 hover:text-ink">
+          <Link href="/admin/products" className="text-[12px] uppercase tracking-widest text-ink-600 hover:text-ink">
             ← Products
           </Link>
           <h1 className="mt-1 font-display text-[27px] leading-tight">{p.title}</h1>
-          <p className="mt-1.5 flex flex-wrap items-center gap-2 text-[12.5px] text-ink-400">
+          <p className="mt-1.5 flex flex-wrap items-center gap-2 text-[12.5px] text-ink-600">
             <Badge tone={p.status === 'published' ? 'ok' : p.status === 'archived' ? 'neutral' : 'warn'}>{p.status}</Badge>
             {p.is_sample === 1 ? <SampleBadge note={p.sample_note} /> : <Badge tone="ok">Verified record</Badge>}
             <span>/product/{p.slug}</span>
@@ -98,7 +98,7 @@ export default async function AdminProductPage({ params }
             note={`${p.totalAvailable} unit${p.totalAvailable === 1 ? '' : 's'} available to sell across ${p.variants.filter((v) => v.status === 'active').length} active variant${p.variants.length === 1 ? '' : 's'}.`}
           >
             {p.variants.length === 0 ? (
-              <p className="py-3 text-[13px] text-ink-400">No variants yet — the product cannot be added to a basket until one exists.</p>
+              <p className="py-3 text-[13px] text-ink-600">No variants yet — the product cannot be added to a basket until one exists.</p>
             ) : (
               <Table head={['SKU', 'Size / colour', 'Price', 'On hand', 'Available', 'Status']}>
                 {p.variants.map((v) => (
@@ -106,13 +106,13 @@ export default async function AdminProductPage({ params }
                     <td className="py-2 pr-4 font-mono text-[11.5px]">{v.sku}</td>
                     <td className="py-2 pr-4 text-[12.5px]">
                       {v.size ?? '—'}
-                      {v.color_name ? <span className="block text-[11.5px] text-ink-400">{v.color_name}</span> : null}
+                      {v.color_name ? <span className="block text-[11.5px] text-ink-600">{v.color_name}</span> : null}
                     </td>
                     <td className="py-2 pr-4 tabular-nums">{formatMoney(v.price_cents ?? p.price_cents, p.currency)}</td>
                     <td className="py-2 pr-4 tabular-nums">{v.stock_qty}</td>
                     <td className={`py-2 pr-4 tabular-nums ${v.available === 0 ? 'text-alert-error' : v.available <= 3 ? 'text-alert-warn' : ''}`}>
                       {v.available}
-                      {v.reserved_qty > 0 ? <span className="block text-[11.5px] text-ink-400">{v.reserved_qty} in baskets</span> : null}
+                      {v.reserved_qty > 0 ? <span className="block text-[11.5px] text-ink-600">{v.reserved_qty} in baskets</span> : null}
                     </td>
                     <td className="py-2 pr-4">
                       <Badge tone={v.status === 'active' ? 'ok' : 'neutral'}>{v.status}</Badge>
@@ -165,14 +165,14 @@ export default async function AdminProductPage({ params }
               <p>
                 <strong className="text-ink">Images: {p.images.length}</strong>
                 {p.images.length > 0 ? (
-                  <span className="ml-2 text-ink-400">
+                  <span className="ml-2 text-ink-600">
                     {p.images.filter((i) => i.kind !== 'photo').length > 0 ? `${String(p.images.filter((i) => i.kind !== 'photo').length)} of them generated placeholders` : 'all uploaded photographs'}
                   </span>
                 ) : (
-                  <span className="ml-2 text-ink-400">— the storefront falls back to generated artwork labelled as sample art.</span>
+                  <span className="ml-2 text-ink-600">— the storefront falls back to generated artwork labelled as sample art.</span>
                 )}
               </p>
-              <p className="border border-dashed border-stone-300 px-3 py-2 text-[12px] text-ink-500">
+              <p className="border border-dashed border-stone-300 px-3 py-2 text-[12px] text-ink-600">
                 There is no file upload in this build: images are served from <code className="text-ink-600">/media/**</code> on the same
                 origin, so real photography means dropping files there (or pointing at the CDN) and inserting rows into{' '}
                 <code className="text-ink-600">product_images</code>. Documented in docs/brand-assets.md.

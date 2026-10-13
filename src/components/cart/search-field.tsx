@@ -35,11 +35,11 @@ export function SearchField() {
         placeholder="Search"
         autoComplete="off"
         maxLength={60}
-        className="w-28 bg-transparent px-3 py-1.5 text-[13px] outline-none transition-[width] placeholder:text-stone-400 focus:w-48 lg:w-36"
+        className="w-28 bg-transparent px-3 py-1.5 text-[13px] outline-none transition-[width] placeholder:text-stone-500 focus:w-48 lg:w-36"
       />
       <button
         type="submit"
-        className="grid h-8 w-8 place-items-center text-ink-500 transition hover:text-ink"
+        className="grid h-10 w-10 place-items-center text-ink-500 transition hover:text-ink lg:h-9 lg:w-9"
         aria-label="Submit search"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" aria-hidden="true">

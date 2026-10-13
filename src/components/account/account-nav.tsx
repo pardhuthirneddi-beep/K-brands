@@ -43,7 +43,7 @@ export function AccountNav() {
           );
         })}
         <li>
-          <button type="button" onClick={signOut} className="w-full px-3 py-2 text-left text-[13px] text-ink-500 transition hover:text-alert-error">
+          <button type="button" onClick={signOut} className="w-full px-3 py-2 text-left text-[13px] text-ink-600 transition hover:text-alert-error">
             Sign out
           </button>
         </li>

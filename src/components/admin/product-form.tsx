@@ -143,10 +143,10 @@ export function ProductForm({ initial, categories }: { initial?: Partial<Product
           </select>
         </div>
         <label className="flex items-start gap-2 pt-6 text-[13px] leading-snug text-ink-600">
-          <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#1a1815]" checked={v.isSample} onChange={(e) => set('isSample', e.target.checked)} />
+          <input type="checkbox" className="mt-0.5 h-4 w-4 accent-ink" checked={v.isSample} onChange={(e) => set('isSample', e.target.checked)} />
           <span>
             Sample / placeholder record
-            <span className="block text-[11.5px] text-ink-400">
+            <span className="block text-[11.5px] text-ink-600">
               Keeps it visibly marked in the storefront and blocks it from being published to a live store.
             </span>
           </span>
@@ -189,7 +189,7 @@ function Text({
         {label}
       </label>
       <input id={id} type={type} className="field" value={value} required={required} onChange={(e) => onChange(e.target.value)} />
-      {error ? <p className="mt-1 text-[12px] text-alert-error">{error}</p> : hint ? <p className="mt-1 text-[11.5px] text-ink-400">{hint}</p> : null}
+      {error ? <p className="mt-1 text-[12px] text-alert-error">{error}</p> : hint ? <p className="mt-1 text-[11.5px] text-ink-600">{hint}</p> : null}
     </div>
   );
 }

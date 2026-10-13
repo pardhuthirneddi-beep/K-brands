@@ -29,7 +29,7 @@ export default async function AdminCouponsPage() {
 
       <Panel title={`${coupons.length} code${coupons.length === 1 ? '' : 's'}`}>
         {coupons.length === 0 ? (
-          <p className="py-6 text-center text-[13px] text-ink-400">No codes yet.</p>
+          <p className="py-6 text-center text-[13px] text-ink-600">No codes yet.</p>
         ) : (
           <Table head={['Code', 'Discount', 'Conditions', 'Usage', 'Window', 'Status']}>
             {coupons.map((c) => {
@@ -60,19 +60,19 @@ export default async function AdminCouponsPage() {
                   </td>
                   <td className="py-2.5 pr-4 text-[12.5px] tabular-nums">
                     {c.kind === 'percent' ? `${(c.value / 100).toFixed(0)}%` : formatMoney(c.value, 'INR')}
-                    {c.max_discount_cents != null ? <span className="block text-[11.5px] text-ink-400">capped at {formatMoney(c.max_discount_cents, 'INR')}</span> : null}
+                    {c.max_discount_cents != null ? <span className="block text-[11.5px] text-ink-600">capped at {formatMoney(c.max_discount_cents, 'INR')}</span> : null}
                   </td>
-                  <td className="py-2.5 pr-4 text-[12px] text-ink-500">
+                  <td className="py-2.5 pr-4 text-[12px] text-ink-600">
                     {c.min_subtotal_cents > 0 ? <>min {formatMoney(c.min_subtotal_cents, 'INR')}</> : <>no minimum</>}
-                    {c.applies_to_category_slug ? <span className="block text-[11.5px] text-ink-400">{c.applies_to_category_slug} only</span> : null}
+                    {c.applies_to_category_slug ? <span className="block text-[11.5px] text-ink-600">{c.applies_to_category_slug} only</span> : null}
                   </td>
                   <td className="py-2.5 pr-4 text-[12px] tabular-nums">
                     {c.used_count} used{c.redemptions !== c.used_count ? ` / ${c.redemptions} redeemed` : ''}
-                    {c.usage_limit != null ? <span className="block text-[11.5px] text-ink-400">limit {c.usage_limit}{c.per_user_limit != null ? ` · ${c.per_user_limit}/customer` : ''}</span> : null}
+                    {c.usage_limit != null ? <span className="block text-[11.5px] text-ink-600">limit {c.usage_limit}{c.per_user_limit != null ? ` · ${c.per_user_limit}/customer` : ''}</span> : null}
                   </td>
-                  <td className="py-2.5 pr-4 text-[12px] text-ink-500">
+                  <td className="py-2.5 pr-4 text-[12px] text-ink-600">
                     {c.starts_at ? c.starts_at.slice(0, 10) : '—'}
-                    <span className="text-ink-400"> → </span>
+                    <span className="text-ink-600"> → </span>
                     {c.ends_at ? c.ends_at.slice(0, 10) : 'open'}
                   </td>
                   <td className="py-2.5 pr-4">

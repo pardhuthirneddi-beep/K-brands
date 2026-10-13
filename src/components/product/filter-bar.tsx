@@ -88,14 +88,14 @@ export function FilterBar({ facets, baseHref }: { facets: Facets; baseHref: stri
           <button
             type="button"
             onClick={() => router.push(baseHref)}
-            className="text-[12px] tracking-label text-ink-400 underline-offset-4 hover:text-ink hover:underline"
+            className="text-[12px] tracking-label text-ink-600 underline-offset-4 hover:text-ink hover:underline"
           >
             Clear all
           </button>
         ) : null}
       </div>
       <div className="flex items-center gap-2">
-        <label htmlFor="sort" className="text-[12px] tracking-label text-ink-400">
+        <label htmlFor="sort" className="text-[12px] tracking-label text-ink-600">
           Sort
         </label>
         <select
@@ -117,7 +117,7 @@ export function FilterBar({ facets, baseHref }: { facets: Facets; baseHref: stri
         <div id="filter-panel" className="w-full animate-fade-in border border-stone-200 bg-white p-5 shadow-card">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <FacetGroup title="Size">
-              {facets.sizes.length === 0 ? <p className="text-[12.5px] text-ink-400">No sizes available.</p> : null}
+              {facets.sizes.length === 0 ? <p className="text-[12.5px] text-ink-600">No sizes available.</p> : null}
               <div className="flex flex-wrap gap-1.5">
                 {facets.sizes.map((f) => (
                   <Chip key={f.size} active={selected.sizes.includes(f.size)} onClick={() => toggle('sizes', f.size)}>
@@ -134,18 +134,18 @@ export function FilterBar({ facets, baseHref }: { facets: Facets; baseHref: stri
                       type="checkbox"
                       checked={selected.colors.includes(f.color.toLowerCase())}
                       onChange={() => toggle('colors', f.color.toLowerCase())}
-                      className="h-3.5 w-3.5 accent-[#1b1a17]"
+                      className="h-3.5 w-3.5 accent-ink"
                     />
                     <span
                       aria-hidden="true"
                       className="inline-block h-3.5 w-3.5 rounded-full border border-stone-300"
-                      style={{ background: f.hex ?? '#dedad3' }}
+                      style={{ background: f.hex ?? '#E4E0D9' /* line */ }}
                     />
                     {f.color}
-                    <span className="text-ink-400">{f.n}</span>
+                    <span className="text-ink-600">{f.n}</span>
                   </label>
                 ))}
-                {facets.colors.length === 0 ? <p className="text-[12.5px] text-ink-400">No colours yet.</p> : null}
+                {facets.colors.length === 0 ? <p className="text-[12.5px] text-ink-600">No colours yet.</p> : null}
               </div>
             </FacetGroup>
             <FacetGroup title="Garment">
@@ -156,19 +156,19 @@ export function FilterBar({ facets, baseHref }: { facets: Facets; baseHref: stri
                       type="checkbox"
                       checked={selected.garments.includes(f.garment)}
                       onChange={() => toggle('garments', f.garment)}
-                      className="h-3.5 w-3.5 accent-[#1b1a17]"
+                      className="h-3.5 w-3.5 accent-ink"
                     />
                     {f.garment.replace(/-/g, ' ')}
-                    <span className="text-ink-400">{f.n}</span>
+                    <span className="text-ink-600">{f.n}</span>
                   </label>
                 ))}
-                {facets.garments.length === 0 ? <p className="text-[12.5px] text-ink-400">No garments yet.</p> : null}
+                {facets.garments.length === 0 ? <p className="text-[12.5px] text-ink-600">No garments yet.</p> : null}
               </div>
             </FacetGroup>
             <FacetGroup title="Price & availability">
               <div className="flex flex-col gap-3">
                 <label className="text-[13px]">
-                  <span className="mb-1 block text-[12px] tracking-label text-ink-400">Up to</span>
+                  <span className="mb-1 block text-[12px] tracking-label text-ink-600">Up to</span>
                   <input
                     type="number"
                     min={0}
@@ -179,16 +179,16 @@ export function FilterBar({ facets, baseHref }: { facets: Facets; baseHref: stri
                       const major = Number(e.target.value);
                       push({ max: Number.isFinite(major) && major > 0 ? String(Math.round(major * 100)) : '' });
                     }}
-                    className="field py-1.5 text-[13px]"
+                    className="field py-1.5 text-base lg:text-[13px]"
                   />
-                  <span className="mt-1 block text-[11.5px] text-ink-400">Enter amount in rupees, then leave the field.</span>
+                  <span className="mt-1 block text-[11.5px] text-ink-600">Enter amount in rupees, then leave the field.</span>
                 </label>
                 <label className="flex cursor-pointer items-center gap-2 text-[13px]">
                   <input
                     type="checkbox"
                     checked={selected.instock}
                     onChange={(e) => push({ instock: e.target.checked })}
-                    className="h-3.5 w-3.5 accent-[#1b1a17]"
+                    className="h-3.5 w-3.5 accent-ink"
                   />
                   In stock only
                 </label>

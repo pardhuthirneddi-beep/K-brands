@@ -198,7 +198,7 @@ export function CheckoutForm({ initialEmail, initialPhone, allowCod }: { initial
               </select>
             </div>
           </div>
-          <p className="text-[12px] leading-relaxed text-ink-400">
+          <p className="text-[12px] leading-relaxed text-ink-600">
             We deliver within India only at this stage. International destinations stay closed until delivery, duties
             and returns support are confirmed.
           </p>
@@ -208,7 +208,7 @@ export function CheckoutForm({ initialEmail, initialPhone, allowCod }: { initial
           <legend className="display-section text-[20px]">3 · Payment</legend>
           <div className="space-y-2.5">
             <label className={`flex cursor-pointer items-start gap-3 border p-4 transition ${!useCod ? 'border-ink bg-white shadow-inset' : 'border-stone-300 bg-white/60'}`}>
-              <input type="radio" name="pay" checked={!useCod} onChange={() => setUseCod(false)} className="mt-1 h-4 w-4 accent-[#1b1a17]" />
+              <input type="radio" name="pay" checked={!useCod} onChange={() => setUseCod(false)} className="mt-1 h-4 w-4 accent-ink" />
               <span>
                 <span className="block text-[14px] font-medium">Pay online (card, UPI, net banking)</span>
                 <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink-500">
@@ -225,7 +225,7 @@ export function CheckoutForm({ initialEmail, initialPhone, allowCod }: { initial
                 disabled={!allowCod}
                 checked={useCod}
                 onChange={() => setUseCod(true)}
-                className="mt-1 h-4 w-4 accent-[#1b1a17]"
+                className="mt-1 h-4 w-4 accent-ink"
               />
               <span>
                 <span className="block text-[14px] font-medium">Cash on delivery</span>
@@ -238,7 +238,7 @@ export function CheckoutForm({ initialEmail, initialPhone, allowCod }: { initial
             </label>
           </div>
           <label className="flex cursor-pointer items-center gap-2.5 text-[13px] text-ink-600">
-            <input type="checkbox" checked={sameBilling} onChange={(e) => setSameBilling(e.target.checked)} className="h-4 w-4 accent-[#1b1a17]" />
+            <input type="checkbox" checked={sameBilling} onChange={(e) => setSameBilling(e.target.checked)} className="h-4 w-4 accent-ink" />
             Billing address is the same as delivery
           </label>
           <div>
@@ -264,7 +264,7 @@ export function CheckoutForm({ initialEmail, initialPhone, allowCod }: { initial
               <li key={i} className="flex items-start justify-between gap-3 py-2.5 text-[13px]">
                 <span className="min-w-0">
                   <span className="block truncate">{l.title}</span>
-                  <span className="text-[11.5px] text-ink-400">
+                  <span className="text-[11.5px] text-ink-600">
                     {[l.size, l.color].filter(Boolean).join(' · ') || 'One size'} × {l.quantity}
                   </span>
                 </span>
@@ -295,7 +295,7 @@ export function CheckoutForm({ initialEmail, initialPhone, allowCod }: { initial
           <button type="submit" disabled={!canSubmit || submitting || shippingUnconfigured} className="btn-solid mt-4 w-full py-3.5">
             {submitting ? <Spinner label="Placing your order" className="text-ivory-100/80" /> : 'Place order'}
           </button>
-          <p className="mt-3 text-[11.5px] leading-relaxed text-ink-400">
+          <p className="mt-3 text-[11.5px] leading-relaxed text-ink-600">
             Placing an order creates an order record on our server. Totals are recalculated at that moment, so a
             stale price on this screen is never charged.
           </p>
@@ -358,7 +358,7 @@ function Field({
       {error ? (
         <p id={`${id}-desc`} className="mt-1 text-[12px] text-alert-error">{error}</p>
       ) : hint ? (
-        <p id={`${id}-desc`} className="mt-1 text-[11.5px] text-ink-400">{hint}</p>
+        <p id={`${id}-desc`} className="mt-1 text-[11.5px] text-ink-600">{hint}</p>
       ) : null}
     </div>
   );

@@ -1,6 +1,13 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
+
+/**
+ * The optimiser only helps raster files: a generated SVG plate has nothing to resize, and routing it
+ * through /_next/image costs a request for a few hundred bytes. Same rule as the product card.
+ */
+const isPhoto = (url: string) => /\.(jpe?g|png|webp)$/i.test(url);
 
 export function Gallery({
   images,
@@ -49,17 +56,33 @@ export function Gallery({
         aria-pressed={zoom}
         className="product-frame block w-full overflow-hidden border border-line"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={current.url}
-          alt={current.alt}
-          width={900}
-          height={1200}
-          className={`mx-auto block h-auto w-full object-cover transition-transform duration-500 ease-editorial ${
-            zoom ? 'scale-[1.6] cursor-zoom-out' : 'cursor-zoom-in'
-          }`}
-          fetchPriority={active === 0 ? 'high' : 'auto'}
-        />
+        {isPhoto(current.url) ? (
+          <Image
+            src={current.url}
+            alt={current.alt}
+            width={900}
+            height={1200}
+            // The first frame is the LCP element of a product page; the optimiser still cuts the
+            // others down to the width the column actually occupies.
+            priority={active === 0}
+            sizes="(max-width: 1023px) 100vw, (max-width: 1359px) 46vw, 560px"
+            className={`mx-auto block h-auto w-full object-cover transition-transform duration-500 ease-editorial ${
+              zoom ? 'scale-[1.6] cursor-zoom-out' : 'cursor-zoom-in'
+            }`}
+          />
+        ) : (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={current.url}
+            alt={current.alt}
+            width={900}
+            height={1200}
+            className={`mx-auto block h-auto w-full object-cover transition-transform duration-500 ease-editorial ${
+              zoom ? 'scale-[1.6] cursor-zoom-out' : 'cursor-zoom-in'
+            }`}
+            fetchPriority={active === 0 ? 'high' : 'auto'}
+          />
+        )}
       </button>
       {list.length > 1 ? (
         <div className="mt-3 flex gap-2.5 overflow-x-auto scroll-x" role="tablist" aria-label="Product images">
@@ -75,17 +98,27 @@ export function Gallery({
                 i === active ? 'border-ink' : 'border-line hover:border-stone-400'
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.url} alt="" loading="lazy" className="h-full w-full object-cover" />
+              {isPhoto(img.url) ? (
+                <Image
+                  src={img.url}
+                  alt=""
+                  fill
+                  sizes="90px"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={img.url} alt="" loading="lazy" className="h-full w-full object-cover" />
+              )}
             </button>
           ))}
         </div>
       ) : null}
-      <p className="mt-2.5 text-[12px] text-ink-400">
+      <p className="mt-2.5 text-[12px] text-ink-600">
         {current.kind === 'generated' || current.kind === 'placeholder'
           ? 'Demo illustration of this colourway · not product photography'
           : 'Demo photography · labelled, not verified product imagery'}
-        {list.length > 1 ? <span className="ml-2 text-stone-400">Frame {String(active + 1)} of {String(list.length)} · click to enlarge</span> : null}
+        {list.length > 1 ? <span className="ml-2 text-stone-500">Frame {String(active + 1)} of {String(list.length)} · click to enlarge</span> : null}
       </p>
     </div>
   );

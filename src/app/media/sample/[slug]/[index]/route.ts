@@ -18,8 +18,9 @@ import { NextResponse } from 'next/server';
  * Banned here on purpose: there is no accessory, footwear, bag, women's or home-goods
  * silhouette in this file, and adding one is out of brand scope.
  */
-const BACKDROPS = ['#f8f6f2', '#f2efe9', '#ede9e2'];
-const FALLBACK_TONE = '#b7b1a6';
+/* Palette values only — the plate has to sit inside the grid like a photograph would. */
+const BACKDROPS = ['#F8F6F2', '#EFECE6', '#EDE9E2'];
+const FALLBACK_TONE = '#ABA69C'; // stone-400
 
 type Drawer = (x: number, y: number, w: number, h: number) => string;
 
@@ -129,7 +130,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ slug: string; i
     colourTag ? ` in ${colourTag}` : ''
   }, for ${safeSlug}">
 <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="${bg}"/><stop offset="1" stop-color="#e6e1d8"/></linearGradient>
+  <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="${bg}"/><stop offset="1" stop-color="#E4E0D9"/></linearGradient>
   <linearGradient id="cloth" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="${tone}"/><stop offset="1" stop-color="${tone}" stop-opacity="0.86"/></linearGradient>
 </defs>
 <rect width="700" height="950" fill="url(#bg)"/>

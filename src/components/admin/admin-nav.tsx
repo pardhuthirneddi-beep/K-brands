@@ -34,7 +34,7 @@ const GROUPS: { title: string; links: { href: string; label: string }[] }[] = [
 export function AdminNav() {
   const pathname = usePathname();
   return (
-    <nav aria-label="Admin" className="border-b border-stone-200 bg-white/70 lg:sticky lg:top-[58px] lg:h-[calc(100vh-58px)] lg:w-[210px] lg:shrink-0 lg:border-b-0 lg:border-r lg:bg-transparent lg:p-4">
+    <nav aria-label="Admin" className="border-b border-stone-200 bg-white/70 lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] xl:top-[72px] xl:h-[calc(100vh-72px)] lg:w-[210px] lg:shrink-0 lg:border-b-0 lg:border-r lg:bg-transparent lg:p-4">
       <div className="flex gap-5 overflow-x-auto scroll-x px-4 py-3 lg:flex-col lg:gap-6 lg:overflow-visible lg:px-0 lg:py-0">
         {GROUPS.map((g) => (
           <div key={g.title} className="shrink-0">

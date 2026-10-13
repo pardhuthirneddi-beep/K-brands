@@ -18,7 +18,7 @@ export function Price({
     <span className={`tabular-nums ${sizes[size]} ${className}`}>
       <span className="font-medium">{formatMoney(cents, currency)}</span>
       {compareAt && compareAt > cents ? (
-        <s className="ml-2 text-stone-400 line-through decoration-stone-400">{formatMoney(compareAt, currency)}</s>
+        <s className="ml-2 text-stone-500 line-through decoration-stone-400">{formatMoney(compareAt, currency)}</s>
       ) : null}
     </span>
   );

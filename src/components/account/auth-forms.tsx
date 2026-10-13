@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { emitCart } from '../providers.tsx';
 
@@ -9,9 +9,9 @@ type Mode = 'login' | 'register' | 'forgot' | 'reset';
 
 const COPY: Record<Mode, { title: string; sub: string; cta: string }> = {
   login: {
-    title: 'Welcome back',
+    title: 'Login',
     sub: 'Sign in to see your orders, saved addresses and any active returns.',
-    cta: 'Sign in',
+    cta: 'Login',
   },
   register: {
     title: 'Create your account',
@@ -19,24 +19,31 @@ const COPY: Record<Mode, { title: string; sub: string; cta: string }> = {
     cta: 'Create account',
   },
   forgot: {
-    title: 'Reset your password',
+    title: 'Forgot your password',
     sub: 'We will send a link to the email address on your account.',
     cta: 'Email me a reset link',
   },
   reset: { title: 'Choose a new password', sub: 'Paste the link you received, then set a new password.', cta: 'Save new password' },
 };
 
-export function AuthForm({ mode }: { mode: Mode }) {
+export function AuthForm({ mode, initialToken = '' }: { mode: Mode; initialToken?: string }) {
   const router = useRouter();
-  const params = useSearchParams();
-  const next = params.get('next') || (mode === 'login' ? '/account' : '/account');
+  /* The post-login destination is read when the form is submitted rather than through
+     useSearchParams. That hook would push the whole screen behind a Suspense boundary, so the
+     heading and the first field arrived a beat after a 'Loading' skeleton — a visible jump on a
+     phone, and a page whose server HTML had no title to announce. */
+  const nextAfterSubmit = () => {
+    const candidate = new URLSearchParams(window.location.search).get('next') || '/account';
+    // Only ever a path on this site, so a crafted ?next= cannot bounce a shopper somewhere else.
+    return candidate.startsWith('/') && !candidate.startsWith('//') ? candidate : '/account';
+  };
   const [form, setForm] = useState({
     email: '',
     password: '',
     confirmPassword: '',
     fullName: '',
     phone: '',
-    token: params.get('token') ?? '',
+    token: initialToken,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
@@ -57,7 +64,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           body: JSON.stringify({ email: form.email, password: form.password }),
         });
         emitCart({ route: true, drawer: false });
-        router.push(res.user?.role === 'admin' ? '/admin' : next);
+        router.push(res.user?.role === 'admin' ? '/admin' : nextAfterSubmit());
         router.refresh();
         return;
       }
@@ -126,8 +133,15 @@ export function AuthForm({ mode }: { mode: Mode }) {
         ) : null}
         {mode !== 'reset' ? (
           <TextField id="email" label="Email" type="email" value={form.email} onChange={set('email')} autoComplete="email" error={errors.email} required />
+        ) : initialToken ? (
+          // The token came from the link they clicked. Showing it as a locked line means it
+          // cannot be edited into something the API will reject, and the field does not ask a
+          // question the shopper has already answered by using the link.
+          <p className="border border-stone bg-stone-100/60 px-4 py-3 text-[13px] text-ink-600">
+            Using the reset link you opened. If that is not you, request a new link below.
+          </p>
         ) : (
-          <TextField id="token" label="Reset token" value={form.token} onChange={set('token')} error={errors.token} required hint="From the link in your email" />
+          <TextField id="token" label="Reset token" value={form.token} onChange={set('token')} error={errors.token} required hint="Paste the token from the reset email" />
         )}
         {mode === 'register' ? (
           <TextField id="phone" label="Mobile (optional)" type="tel" inputMode="numeric" value={form.phone} onChange={set('phone')} autoComplete="tel" error={errors.phone} />
@@ -154,7 +168,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         </button>
       </form>
 
-      <div className="mt-5 space-y-2 text-[13px] text-ink-500">
+      <div className="mt-5 space-y-2 text-[13px] text-ink-600">
         {mode === 'login' ? (
           <>
             <p>
@@ -169,7 +183,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
         ) : (
           <p>
             Already registered?{' '}
-            <Link href="/account/login" className="text-ink underline underline-offset-4">Sign in</Link>
+            <Link href="/account/login" className="text-ink underline underline-offset-4">Login</Link>
           </p>
         )}
       </div>
@@ -234,7 +248,7 @@ function TextField({
       {error ? (
         <p id={`${id}-d`} className="mt-1 text-[12px] text-alert-error">{error}</p>
       ) : hint ? (
-        <p id={`${id}-d`} className="mt-1 text-[11.5px] text-ink-400">{hint}</p>
+        <p id={`${id}-d`} className="mt-1 text-[11.5px] text-ink-600">{hint}</p>
       ) : null}
     </div>
   );

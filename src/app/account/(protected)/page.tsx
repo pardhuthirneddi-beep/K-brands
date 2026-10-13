@@ -72,7 +72,7 @@ export default async function AccountOverview() {
                   <Link href={`/order/${o.order_number}`} className="font-display text-[16px] hover:underline">
                     {o.order_number}
                   </Link>
-                  <p className="text-[12px] text-ink-400">
+                  <p className="text-[12px] text-ink-600">
                     {new Date(o.created_at as string).toLocaleDateString('en-IN', { dateStyle: 'medium' })} ·{' '}
                     {humanStatus(o.status as string)}
                     {o.is_sample_order === 1 ? ' · test order' : ''}
@@ -107,7 +107,7 @@ export default async function AccountOverview() {
 function Info({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-3">
-      <dt className="w-20 shrink-0 text-ink-400">{label}</dt>
+      <dt className="w-20 shrink-0 text-ink-600">{label}</dt>
       <dd className="truncate text-ink-700">{value}</dd>
     </div>
   );

@@ -89,7 +89,7 @@ export default async function AdminReturnsPage({
 
       <Panel title={`${rows.length} request${rows.length === 1 ? '' : 's'}`}>
         {rows.length === 0 ? (
-          <p className="py-8 text-center text-[13px] text-ink-400">Nothing in this queue.</p>
+          <p className="py-8 text-center text-[13px] text-ink-600">Nothing in this queue.</p>
         ) : (
           <ul className="space-y-4">
             {rows.map((r) => {
@@ -109,7 +109,7 @@ export default async function AdminReturnsPage({
                           inspection: {r.inspection_status}
                         </Badge>
                       </p>
-                      <p className="mt-1.5 text-[12.5px] text-ink-500">
+                      <p className="mt-1.5 text-[12.5px] text-ink-600">
                         <Link href={`/admin/orders/${r.order_id}`} className="underline underline-offset-4">
                           {r.order_number}
                         </Link>{' '}
@@ -120,7 +120,7 @@ export default async function AdminReturnsPage({
                         <span className="font-medium">{r.reason_code.replace(/_/g, ' ')}</span>
                         {r.reason_detail ? ` — ${r.reason_detail}` : ''}
                       </p>
-                      <p className="mt-1.5 text-[12px] text-ink-400">
+                      <p className="mt-1.5 text-[12px] text-ink-600">
                         Requested {r.requested_refund_cents != null ? formatMoney(r.requested_refund_cents, r.currency) : 'no refund'}
                         {r.approved_refund_cents != null ? ` · approved ${formatMoney(r.approved_refund_cents, r.currency)}` : ''}
                         {r.disposition ? ` · disposition ${r.disposition}` : ''}
@@ -208,7 +208,7 @@ export default async function AdminReturnsPage({
         )}
       </Panel>
 
-      <p className="text-[12px] leading-relaxed text-ink-400">
+      <p className="text-[12px] leading-relaxed text-ink-600">
         Refund amounts above the configured policy limit, or on orders outside the return window, are refused by the
         domain layer — the buttons here only record what the rules already allow.
         {policy.returnShipping ? ` Return shipping policy: ${policy.returnShipping.replace(/_/g, ' ')}.` : ''}

@@ -88,7 +88,7 @@ export function SettingRow({
         <label htmlFor={`set-${settingKey}`} className="text-[13px] font-medium text-ink">
           {label}
         </label>
-        <code className="text-[11.5px] text-ink-400">{settingKey}</code>
+        <code className="text-[11.5px] text-ink-600">{settingKey}</code>
       </div>
       <div className="mt-1.5 flex flex-wrap items-center gap-2">
         {kind === 'boolean' ? (
@@ -106,7 +106,7 @@ export function SettingRow({
           <textarea
             id={`set-${settingKey}`}
             rows={2}
-            className="field max-w-[420px] flex-1 py-1.5 font-mono text-[12px]"
+            className="field max-w-[420px] flex-1 py-1.5 font-mono text-base lg:text-[12px]"
             value={text}
             placeholder={kind === 'list' ? 'formal, party-wear' : 'e.g. 499000 or {"zone":"IN"}'}
             onChange={(e) => setText(e.target.value)}
@@ -131,16 +131,16 @@ export function SettingRow({
           {busy ? 'Saving…' : 'Save'}
         </button>
         {needsReview ? (
-          <label className="flex items-center gap-1.5 text-[11.5px] text-ink-500">
-            <input type="checkbox" className="h-3.5 w-3.5 accent-[#1a1815]" checked={flag} onChange={(e) => setFlag(e.target.checked)} />
+          <label className="flex items-center gap-1.5 text-[11.5px] text-ink-600">
+            <input type="checkbox" className="h-3.5 w-3.5 accent-ink" checked={flag} onChange={(e) => setFlag(e.target.checked)} />
             approved by owner
           </label>
         ) : null}
         {needsReview ? <ReviewBadge label="Awaiting approval" /> : null}
       </div>
       {msg ? <p className="mt-1 text-[11.5px] text-alert-error">{msg}</p> : null}
-      {hint ? <p className="mt-1 text-[11.5px] leading-snug text-ink-400">{hint}</p> : null}
-      <p className="mt-1 text-[11.5px] text-ink-400">
+      {hint ? <p className="mt-1 text-[11.5px] leading-snug text-ink-600">{hint}</p> : null}
+      <p className="mt-1 text-[11.5px] text-ink-600">
         source: {source} · last change {updatedAt.slice(0, 16).replace('T', ' ')}
       </p>
     </li>

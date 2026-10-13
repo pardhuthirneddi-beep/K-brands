@@ -11,7 +11,7 @@ export function Pagination({ page, pages, hrefFor }: { page: number; pages: numb
           Previous
         </Link>
       ) : null}
-      {window[0]! > 1 ? <span className="px-1 text-stone-400">…</span> : null}
+      {window[0]! > 1 ? <span className="px-1 text-stone-500">…</span> : null}
       {window.map((p) => (
         <Link
           key={p}
@@ -24,7 +24,7 @@ export function Pagination({ page, pages, hrefFor }: { page: number; pages: numb
           {p}
         </Link>
       ))}
-      {window[window.length - 1]! < pages ? <span className="px-1 text-stone-400">…</span> : null}
+      {window[window.length - 1]! < pages ? <span className="px-1 text-stone-500">…</span> : null}
       {page < pages ? (
         <Link href={hrefFor(page + 1)} className="btn-quiet px-3 py-1.5 text-[11.5px]">
           Next

@@ -77,7 +77,7 @@ export default async function AboutPage() {
                 ['Seller identity', s.legalEntityName ? 'Configured' : 'Pending owner review'],
               ].map(([k, v]) => (
                 <div key={k as string} className="flex items-start justify-between gap-4 border-b border-stone-200 pb-2 last:border-0">
-                  <dt className="text-ink-400">{k}</dt>
+                  <dt className="text-ink-600">{k}</dt>
                   <dd className="text-right text-ink-700">{v}</dd>
                 </div>
               ))}

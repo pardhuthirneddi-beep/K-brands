@@ -71,11 +71,11 @@ export default async function AdminOrderPage({ params }
     <div className="space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href="/admin/orders" className="text-[12px] uppercase tracking-widest text-ink-400 hover:text-ink">
+          <Link href="/admin/orders" className="text-[12px] uppercase tracking-widest text-ink-600 hover:text-ink">
             ← Orders
           </Link>
           <h1 className="mt-1 font-display text-[27px] leading-tight">{o.order_number}</h1>
-          <p className="mt-1 flex flex-wrap items-center gap-2 text-[12.5px] text-ink-400">
+          <p className="mt-1 flex flex-wrap items-center gap-2 text-[12.5px] text-ink-600">
             placed {o.created_at.slice(0, 16).replace('T', ' ')} UTC
             {o.is_sample_order === 1 ? <SampleBadge label="Sample order — not real demand" /> : null}
             <Badge tone={o.payment_status === 'captured' ? 'ok' : o.payment_status === 'failed' ? 'error' : 'warn'}>
@@ -120,7 +120,7 @@ export default async function AdminOrderPage({ params }
           <div className="flex flex-wrap items-center gap-3">
             <ActionButton tone="solid" label="Approve cancellation" path={`/api/admin/orders/${o.id}`} body={{ action: 'resolve_cancellation', approve: true }} confirm="Approve? The order is cancelled and any payment is queued for refund." />
             <ActionButton tone="danger" label="Reject" path={`/api/admin/orders/${o.id}`} body={{ action: 'resolve_cancellation', approve: false }} confirm="Reject the cancellation request? The order stays in fulfilment." />
-            <p className="text-[12px] text-ink-400">
+            <p className="text-[12px] text-ink-600">
               Approval follows the cancellation policy window configured in settings; the server decides, not this button.
             </p>
           </div>
@@ -137,12 +137,12 @@ export default async function AdminOrderPage({ params }
                     <Link href={`/product/${String(l.snapshot_slug)}`} className="underline-offset-4 hover:underline">
                       {String(l.snapshot_title)}
                     </Link>
-                    <span className="mt-0.5 block text-[11.5px] text-ink-400">
+                    <span className="mt-0.5 block text-[11.5px] text-ink-600">
                       {[l.snapshot_size, l.snapshot_color].filter(Boolean).join(' · ')}
                     </span>
                     {l.is_sample === 1 ? <span className="mt-1 inline-block"><SampleBadge /></span> : null}
                   </td>
-                  <td className="py-2.5 pr-4 font-mono text-[11.5px] text-ink-500">{String(l.snapshot_sku)}</td>
+                  <td className="py-2.5 pr-4 font-mono text-[11.5px] text-ink-600">{String(l.snapshot_sku)}</td>
                   <td className="py-2.5 pr-4 tabular-nums">{String(l.quantity)}</td>
                   <td className="py-2.5 pr-4 tabular-nums">{money(Number(l.unit_price_cents))}</td>
                   <td className="py-2.5 pr-4 tabular-nums">{money(Number(l.line_total_cents))}</td>
@@ -167,14 +167,14 @@ export default async function AdminOrderPage({ params }
                 <dd className="tabular-nums">{money(o.total_cents)}</dd>
               </div>
               {o.coupon_code ? (
-                <p className="text-[11.5px] text-ink-400">Coupon {o.coupon_code}</p>
+                <p className="text-[11.5px] text-ink-600">Coupon {o.coupon_code}</p>
               ) : null}
             </dl>
           </Panel>
 
           <Panel title="Payment records" note="Only a verified provider webhook or a provider lookup can move an order to paid — the admin UI has no such button.">
             {summary.payments.length === 0 ? (
-              <p className="py-3 text-[13px] text-ink-400">No payment attempt recorded.</p>
+              <p className="py-3 text-[13px] text-ink-600">No payment attempt recorded.</p>
             ) : (
               <ul className="space-y-2 text-[13px]">
                 {summary.payments.map((pm) => (
@@ -187,7 +187,7 @@ export default async function AdminOrderPage({ params }
                     </span>
                     <span className="tabular-nums">{money(Number(pm.amount_cents))}</span>
                     {pm.failure_message ? <span className="w-full text-[11.5px] text-alert-error">{String(pm.failure_message)}</span> : null}
-                    {pm.verified_at ? <span className="w-full text-[11.5px] text-ink-400">verified {String(pm.verified_at).slice(0, 16).replace('T', ' ')} UTC</span> : null}
+                    {pm.verified_at ? <span className="w-full text-[11.5px] text-ink-600">verified {String(pm.verified_at).slice(0, 16).replace('T', ' ')} UTC</span> : null}
                   </li>
                 ))}
               </ul>
@@ -201,7 +201,7 @@ export default async function AdminOrderPage({ params }
                   path={`/api/payments/status?orderId=${o.id}`}
                   body={{}}
                 />
-                <p className="mt-1.5 text-[11.5px] leading-snug text-ink-400">
+                <p className="mt-1.5 text-[11.5px] leading-snug text-ink-600">
                   Re-verifies against the provider and captures the order if the payment is confirmed. Safe to repeat.
                 </p>
               </div>
@@ -223,7 +223,7 @@ export default async function AdminOrderPage({ params }
 
           <Panel title="Shipping & tracking">
             {summary.shipments.length === 0 ? (
-              <p className="py-2 text-[13px] text-ink-400">No shipment created yet.</p>
+              <p className="py-2 text-[13px] text-ink-600">No shipment created yet.</p>
             ) : (
               <ul className="mb-4 space-y-2 text-[13px]">
                 {summary.shipments.map((sh) => (
@@ -231,9 +231,9 @@ export default async function AdminOrderPage({ params }
                     <span className="flex items-center gap-2">
                       <Badge tone="outline">{String(sh.status)}</Badge>
                       <span className="font-mono text-[12px]">{String(sh.tracking_number ?? 'no reference')}</span>
-                      <span className="text-ink-400">{String(sh.courier ?? '')} · {String(sh.provider)}/{String(sh.provider_mode)}</span>
+                      <span className="text-ink-600">{String(sh.courier ?? '')} · {String(sh.provider)}/{String(sh.provider_mode)}</span>
                     </span>
-                    {sh.estimated_delivery_date ? <span className="text-[12px] text-ink-500">ETA {String(sh.estimated_delivery_date)}</span> : null}
+                    {sh.estimated_delivery_date ? <span className="text-[12px] text-ink-600">ETA {String(sh.estimated_delivery_date)}</span> : null}
                   </li>
                 ))}
               </ul>
@@ -257,12 +257,12 @@ export default async function AdminOrderPage({ params }
               {summary.events.map((ev, i) => (
                 <li key={i} className="flex flex-wrap items-baseline gap-2 border-b border-stone-200 pb-2 text-[12.5px] last:border-0">
                   <span className="font-medium text-ink">{humanStatus(String(ev.to_status ?? ev.event))}</span>
-                  {ev.from_status ? <span className="text-ink-400">from {humanStatus(String(ev.from_status))}</span> : null}
+                  {ev.from_status ? <span className="text-ink-600">from {humanStatus(String(ev.from_status))}</span> : null}
                   <span className="text-ink-500">{String(ev.detail ?? '')}</span>
-                  <span className="ml-auto whitespace-nowrap text-[11.5px] text-ink-400">{String(ev.created_at).slice(0, 16).replace('T', ' ')}</span>
+                  <span className="ml-auto whitespace-nowrap text-[11.5px] text-ink-600">{String(ev.created_at).slice(0, 16).replace('T', ' ')}</span>
                 </li>
               ))}
-              {summary.events.length === 0 ? <li className="py-2 text-[13px] text-ink-400">No events recorded.</li> : null}
+              {summary.events.length === 0 ? <li className="py-2 text-[13px] text-ink-600">No events recorded.</li> : null}
             </ol>
           </Panel>
         </div>
@@ -270,7 +270,7 @@ export default async function AdminOrderPage({ params }
         <div className="space-y-4">
           <Panel title="Customer">
             {summary.addresses.length === 0 ? (
-              <p className="text-[13px] text-ink-400">No address snapshot — the order was not completed.</p>
+              <p className="text-[13px] text-ink-600">No address snapshot — the order was not completed.</p>
             ) : null}
             <ul className="space-y-3">
               {summary.addresses.map((a, i) => (
@@ -294,7 +294,7 @@ export default async function AdminOrderPage({ params }
                 </li>
               ))}
             </ul>
-            <div className="mt-3 space-y-1 border-t border-stone-200 pt-3 text-[12.5px] text-ink-500">
+            <div className="mt-3 space-y-1 border-t border-stone-200 pt-3 text-[12.5px] text-ink-600">
               <p>Contact: {o.guest_email ?? (o.user_id ? `account #${o.user_id}` : '—')}</p>
               {o.contact_phone ? <p>Phone: {o.contact_phone}</p> : null}
               {o.user_id ? (
@@ -325,7 +325,7 @@ export default async function AdminOrderPage({ params }
 
           <Panel title="Returns on this order">
             {summary.returns.length === 0 ? (
-              <p className="py-2 text-[13px] text-ink-400">No returns, exchanges or cancellation requests.</p>
+              <p className="py-2 text-[13px] text-ink-600">No returns, exchanges or cancellation requests.</p>
             ) : (
               <ul className="space-y-2 text-[12.5px]">
                 {summary.returns.map((r) => (
@@ -333,12 +333,12 @@ export default async function AdminOrderPage({ params }
                     <Link href={`/admin/returns?q=${String(r.reference)}`} className="font-medium underline-offset-4 hover:underline">
                       {String(r.reference)}
                     </Link>
-                    <span className="ml-2 text-ink-400">{String(r.type)}</span>
+                    <span className="ml-2 text-ink-600">{String(r.type)}</span>
                     <span className="mt-1 flex items-center gap-2">
                       <Badge tone={String(r.status) === 'closed' ? 'ok' : 'warn'}>
                         {RETURN_STATUS_LABELS[String(r.status) as keyof typeof RETURN_STATUS_LABELS] ?? String(r.status)}
                       </Badge>
-                      <span className="text-ink-400">refund {String(r.refund_status)}</span>
+                      <span className="text-ink-600">refund {String(r.refund_status)}</span>
                     </span>
                   </li>
                 ))}
@@ -356,7 +356,7 @@ export default async function AdminOrderPage({ params }
                   <li key={String(rf.id)} className="flex items-center justify-between gap-2">
                     <Badge tone={rf.status === 'issued' ? 'ok' : rf.status === 'failed' ? 'error' : 'warn'}>{String(rf.status)}</Badge>
                     <span className="tabular-nums">{money(Number(rf.amount_cents))}</span>
-                    <span className="ml-auto text-ink-400">{String(rf.created_at).slice(0, 10)}</span>
+                    <span className="ml-auto text-ink-600">{String(rf.created_at).slice(0, 10)}</span>
                   </li>
                 ))}
               </ul>

@@ -24,7 +24,7 @@ export default async function NewProductPage() {
       >
         <ProductForm categories={categories} />
       </Panel>
-      <p className="text-[12px] leading-relaxed text-ink-400">
+      <p className="text-[12px] leading-relaxed text-ink-600">
         Sizes, colours, SKUs and stock live on variants — add them on the product page after saving, or use{' '}
         <code className="text-ink-600">npm run db:seed-demo</code> for a full sample grid.
       </p>

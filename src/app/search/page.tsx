@@ -55,7 +55,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   return (
     <>
       <div className="container pt-10">
-        <p className="text-[12.5px] text-ink-400">
+        <p className="text-[12.5px] text-ink-600">
           <Link href="/search" className="underline-offset-4 hover:underline">Search</Link> / “{q}”
         </p>
       </div>

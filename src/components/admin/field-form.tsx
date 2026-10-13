@@ -123,7 +123,7 @@ export function FieldForm({
               <textarea
                 id={`${path}-${f.name}`}
                 rows={3}
-                className="field resize-y text-[13px]"
+                className="field resize-y text-base lg:text-[13px]"
                 value={String(values[f.name] ?? '')}
                 placeholder={f.placeholder}
                 onChange={(e) => set(f.name, e.target.value)}
@@ -141,7 +141,7 @@ export function FieldForm({
                 <input
                   id={`${path}-${f.name}`}
                   type="checkbox"
-                  className="h-4 w-4 accent-[#1a1815]"
+                  className="h-4 w-4 accent-ink"
                   checked={values[f.name] === true}
                   onChange={(e) => set(f.name, e.target.checked)}
                 />
@@ -149,7 +149,7 @@ export function FieldForm({
               </label>
             ) : (
               <div className="flex items-center gap-2">
-                {f.prefix ? <span className="text-[13px] text-ink-400">{f.prefix}</span> : null}
+                {f.prefix ? <span className="text-[13px] text-ink-600">{f.prefix}</span> : null}
                 <input
                   id={`${path}-${f.name}`}
                   type={f.type === 'number' ? 'number' : 'text'}
@@ -161,11 +161,11 @@ export function FieldForm({
                 />
               </div>
             )}
-            {f.hint ? <p className="mt-1 text-[11.5px] leading-snug text-ink-400">{f.hint}</p> : null}
+            {f.hint ? <p className="mt-1 text-[11.5px] leading-snug text-ink-600">{f.hint}</p> : null}
           </div>
         );
       })}
-      {note ? <p className="text-[11.5px] leading-relaxed text-ink-400">{note}</p> : null}
+      {note ? <p className="text-[11.5px] leading-relaxed text-ink-600">{note}</p> : null}
       <button
         type="submit"
         disabled={state === 'busy'}

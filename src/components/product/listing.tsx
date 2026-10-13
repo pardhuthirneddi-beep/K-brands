@@ -76,7 +76,7 @@ export function ListingView({
           <h1 className="display-section">{title}</h1>
           {intro ? <p className="mt-3 text-[14.5px] leading-relaxed text-ink-500">{intro}</p> : null}
         </div>
-        <p className="text-[12.5px] text-ink-400" aria-live="polite">
+        <p className="text-[12.5px] text-ink-600" aria-live="polite">
           {list.total} {list.total === 1 ? 'style' : 'styles'}
         </p>
       </header>

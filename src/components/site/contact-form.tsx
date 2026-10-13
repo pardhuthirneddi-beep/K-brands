@@ -100,7 +100,7 @@ export function ContactForm() {
             {errors.message}
           </p>
         ) : (
-          <p className="mt-1 text-[11.5px] text-ink-400">{form.message.length}/3000 · at least 20 characters</p>
+          <p className="mt-1 text-[11.5px] text-ink-600">{form.message.length}/3000 · at least 20 characters</p>
         )}
       </div>
       {/* honeypot: humans never see or fill this */}

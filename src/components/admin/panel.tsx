@@ -31,7 +31,7 @@ export function Stat({ label, value, hint, tone }: { label: string; value: strin
     <div className="border border-stone-200 bg-white p-4 shadow-card">
       <p className="eyebrow">{label}</p>
       <p className={clsx('mt-1 font-display text-[27px] leading-none tabular-nums', toneClass)}>{value}</p>
-      {hint ? <p className="mt-1.5 text-[11.5px] leading-snug text-ink-400">{hint}</p> : null}
+      {hint ? <p className="mt-1.5 text-[11.5px] leading-snug text-ink-600">{hint}</p> : null}
     </div>
   );
 }
@@ -43,7 +43,7 @@ export function Table({ head, children }: { head: string[]; children: React.Reac
         <thead>
           <tr className="border-b border-stone-300">
             {head.map((h) => (
-              <th key={h} scope="col" className="whitespace-nowrap py-2 pr-4 text-[10.5px] font-medium uppercase tracking-widest text-ink-400">
+              <th key={h} scope="col" className="whitespace-nowrap py-2 pr-4 text-[10.5px] font-medium uppercase tracking-widest text-ink-600">
                 {h}
               </th>
             ))}

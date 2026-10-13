@@ -94,7 +94,7 @@ export function NewsletterForm({ source = 'homepage' }: { source?: string }) {
           <span className="text-alert-ok">{message}</span>
         ) : null}
       </p>
-      {state === 'ok' && note ? <p className="mt-1 text-[12px] leading-relaxed text-ink-400">{note}</p> : null}
+      {state === 'ok' && note ? <p className="mt-1 text-[12px] leading-relaxed text-ink-600">{note}</p> : null}
     </form>
   );
 }

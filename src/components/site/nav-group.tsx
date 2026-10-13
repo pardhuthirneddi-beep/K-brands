@@ -75,12 +75,12 @@ export function NavGroup({
               className="flex items-baseline justify-between gap-3 px-4 py-2 text-[13px] text-ink-600 transition hover:bg-stone-100 hover:text-ink"
             >
               {c.label}
-              <span className="text-[11.5px] text-ink-400">{c.count}</span>
+              <span className="text-[11.5px] text-ink-600">{c.count}</span>
             </Link>
           ))}
           <Link
             href={href}
-            className="mt-1 block border-t border-line px-4 pt-2.5 pb-1 text-[12px] text-ink-500 transition hover:text-ink"
+            className="mt-1 block border-t border-line px-4 pt-2.5 pb-1 text-[12px] text-ink-600 transition hover:text-ink"
           >
             View all {label.toLowerCase()}
           </Link>

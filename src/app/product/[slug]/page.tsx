@@ -103,7 +103,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       ) : null}
       <nav aria-label="Breadcrumb" className="border-b border-stone-200 bg-white/40">
-        <ol className="container flex flex-wrap items-center gap-1.5 py-3 text-[12px] text-ink-400">
+        <ol className="container flex flex-wrap items-center gap-1.5 py-3 text-[12px] text-ink-600">
           {[
             { href: '/', label: 'Home' },
             { href: '/shop', label: 'Shop all' },
@@ -178,7 +178,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
                   .filter(([, v]) => Boolean(v))
                   .map(([k, v]) => (
                     <div key={k as string} className="flex gap-4 py-2">
-                      <dt className="w-36 shrink-0 text-ink-400">{k}</dt>
+                      <dt className="w-36 shrink-0 text-ink-600">{k}</dt>
                       <dd className="text-ink-700">{v as string}</dd>
                     </div>
                   ))}

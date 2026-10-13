@@ -40,7 +40,7 @@ export default async function CheckoutPage() {
           </p>
           <span className="flex gap-4 text-[12px] tracking-label">
             <Link href="/account/login?next=/checkout" className="underline underline-offset-4">Sign in</Link>
-            <Link href="/account/register" className="text-ink-400 underline underline-offset-4">Create one</Link>
+            <Link href="/account/register" className="text-ink-600 underline underline-offset-4">Create one</Link>
           </span>
         </div>
       ) : null}

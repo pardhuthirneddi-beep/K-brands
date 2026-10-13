@@ -82,7 +82,7 @@ export default async function AdminOrdersPage({
           <p className="eyebrow">Fulfilment</p>
           <h1 className="font-display text-[27px] leading-tight">Orders</h1>
         </div>
-        <p className="text-[12.5px] text-ink-400">
+        <p className="text-[12.5px] text-ink-600">
           {total.toLocaleString('en-IN')} order{total === 1 ? '' : 's'} · page {page} of {pages}
         </p>
       </header>
@@ -116,7 +116,7 @@ export default async function AdminOrdersPage({
 
       <Panel title={`Orders (${total.toLocaleString('en-IN')})`}>
         {rows.length === 0 ? (
-          <p className="py-8 text-center text-[13px] text-ink-400">No orders match this filter.</p>
+          <p className="py-8 text-center text-[13px] text-ink-600">No orders match this filter.</p>
         ) : (
           <Table head={['Order', 'Customer', 'Items value', 'Status', 'Payment', 'Fulfilment', 'Placed']}>
             {rows.map((o) => (
@@ -130,9 +130,9 @@ export default async function AdminOrdersPage({
                       <SampleBadge />
                     </span>
                   ) : null}
-                  {o.internal_note ? <span className="mt-1 block max-w-[200px] truncate text-[11.5px] text-ink-400">{o.internal_note}</span> : null}
+                  {o.internal_note ? <span className="mt-1 block max-w-[200px] truncate text-[11.5px] text-ink-600">{o.internal_note}</span> : null}
                 </td>
-                <td className="max-w-[200px] py-2.5 pr-4 text-[12.5px] text-ink-500">
+                <td className="max-w-[200px] py-2.5 pr-4 text-[12.5px] text-ink-600">
                   <span className="block truncate">{o.customer}</span>
                   <span className="block truncate text-[11.5px]">{o.email}</span>
                 </td>
@@ -148,8 +148,8 @@ export default async function AdminOrdersPage({
                 <td className="py-2.5 pr-4">
                   <Badge tone={o.payment_status === 'captured' ? 'ok' : o.payment_status === 'failed' ? 'error' : 'warn'}>{o.payment_status}</Badge>
                 </td>
-                <td className="py-2.5 pr-4 text-[12px] text-ink-500">{o.fulfilment_status}</td>
-                <td className="whitespace-nowrap py-2.5 pr-4 text-[12px] text-ink-400">{String(o.created_at).slice(0, 16).replace('T', ' ')}</td>
+                <td className="py-2.5 pr-4 text-[12px] text-ink-600">{o.fulfilment_status}</td>
+                <td className="whitespace-nowrap py-2.5 pr-4 text-[12px] text-ink-600">{String(o.created_at).slice(0, 16).replace('T', ' ')}</td>
               </tr>
             ))}
           </Table>
@@ -164,7 +164,7 @@ export default async function AdminOrdersPage({
           >
             Previous
           </Link>
-          <span className="text-ink-400">
+          <span className="text-ink-600">
             Page {page} / {pages}
           </span>
           <Link

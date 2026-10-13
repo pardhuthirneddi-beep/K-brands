@@ -53,7 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="flex min-h-full flex-col">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-toast focus:rounded-xs focus:bg-ink focus:px-4 focus:py-2 focus:text-[12px] focus:uppercase focus:tracking-widest focus:text-ivory-100"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-toast focus:rounded-xs focus:bg-ink focus:px-4 focus:py-2.5 focus:text-[13px] focus:text-ivory-100"
         >
           Skip to content
         </a>
@@ -67,7 +67,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
           ) : null}
           <SiteHeader cartCount={cartCount} user={user ? { name: user.fullName, role: user.role } : null} />
-          <main id="main" className="flex-1">
+          {/* tabIndex makes the skip-link target focusable, so the keyboard caret actually
+              lands here instead of staying at the top of the document. */}
+          <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
             {children}
           </main>
           <SiteFooter />

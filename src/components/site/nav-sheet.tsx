@@ -3,6 +3,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const POLICY_LINKS: [string, string][] = [
   ['/policies/shipping', 'Shipping'],
@@ -16,6 +17,7 @@ const POLICY_LINKS: [string, string][] = [
 type NavCategory = { slug: string; name: string; parent_slug: string | null; product_count: number };
 
 export function NavSheet({ categories }: { categories: NavCategory[] }) {
+  const pathname = usePathname();
   // Roots first, each followed by its non-empty children, so the mobile menu mirrors
   // the desktop tree instead of dumping a flat list.
   const links: { href: string; label: string; sub?: boolean }[] = [
@@ -45,7 +47,8 @@ export function NavSheet({ categories }: { categories: NavCategory[] }) {
       <Dialog.Trigger asChild>
         <button
           type="button"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-xs border border-transparent text-ink transition hover:border-stone-300 lg:hidden"
+          aria-label="Open menu"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-xs border border-transparent text-ink transition hover:border-stone-300 lg:hidden"
         >
           <span className="sr-only">Open menu</span>
           <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true" fill="none" stroke="currentColor">
@@ -71,6 +74,7 @@ export function NavSheet({ categories }: { categories: NavCategory[] }) {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    aria-current={pathname === item.href.split('?')[0] ? 'page' : undefined}
                     onClick={() => setOpen(false)}
                     className={`block border-b border-line py-3 leading-tight text-ink transition hover:translate-x-1 hover:text-ink-500 ${
                       item.sub ? 'pl-4 font-sans text-[15px] text-ink-500' : 'font-display text-[20px]'

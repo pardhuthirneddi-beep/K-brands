@@ -21,7 +21,7 @@ export function CartButton({ initialCount }: { initialCount: number }) {
       <span
         aria-hidden="true"
         className={`grid h-4 min-w-4 place-items-center rounded-full px-1 text-[11.5px] tabular-nums transition ${
-          value > 0 ? 'bg-ink text-ivory-100' : 'bg-stone-200 text-ink-400'
+          value > 0 ? 'bg-ink text-ivory-100' : 'bg-stone-200 text-ink-600'
         }`}
       >
         {value > 0 ? value : '0'}
