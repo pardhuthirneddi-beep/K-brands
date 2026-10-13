@@ -11,6 +11,8 @@ ensureDb();
 
 export type ListingSearch = {
   q?: string;
+  /** product_tags filter, e.g. 'new' for New Arrivals or 'featured'. */
+  tag?: string;
   sizes?: string;
   colors?: string;
   garments?: string;
@@ -36,6 +38,7 @@ export function buildListing(opts: { categorySlug?: string | null; search?: stri
     garmentTypes: p.garments?.split(',').filter(Boolean),
     maxPriceCents: p.max ? Math.max(0, Number(p.max) || 0) : null,
     onlyInStock: p.instock === '1',
+    tag: p.tag ?? null,
     includeSamples: env.demoCatalogueEnabled,
   });
   const facets = facetCounts({ categorySlug: opts.categorySlug ?? null, includeSamples: env.demoCatalogueEnabled });

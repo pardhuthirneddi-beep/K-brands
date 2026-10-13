@@ -34,11 +34,18 @@ export const SIZE_GUIDES: Record<string, SizeGuide> = {
       ['38', '97', '118', '70', '84'],
     ],
   },
-  'one-size': {
-    title: 'One-size accessories',
-    note: 'Accessories are made to a single dimension so they layer without sizing choices.',
-    howTo: 'Check the flat dimensions against how you actually wear the piece — a scarf looped twice needs more length than one draped.',
-    columns: ['Size', 'Length', 'Width'],
-    rows: [['One size', '180', '30']],
+  'bottoms-shorts': {
+    title: 'Shorts',
+    note: 'Measured flat at the waistband. Inseam is from the crotch seam to the hem.',
+    howTo: 'For a just-above-the-knee finish, look for a 17-19cm inseam at a size M. Size up one if you want room through the thigh.',
+    columns: ['Size', 'Waist (cm)', 'Hip (cm)', 'Inseam (cm)', 'Leg opening (cm)'],
+    rows: [
+      ['XS', '70', '100', '16', '26'],
+      ['S', '75', '104', '17', '27'],
+      ['M', '80', '108', '18', '28'],
+      ['L', '85', '112', '18.5', '29'],
+      ['XL', '90', '117', '19', '30'],
+      ['XXL', '96', '122', '19.5', '31'],
+    ],
   },
 };

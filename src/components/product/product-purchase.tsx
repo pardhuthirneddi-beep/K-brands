@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { apiFetch, emitCart } from '../providers.tsx';
 import { useCart } from '../providers.tsx';
@@ -29,6 +29,8 @@ export function ProductPurchase({
   productSlug,
   currency,
   taxNote,
+  /** Deep-link support: /product/x?size=M opens with that size already chosen. */
+  initialSize,
 }: {
   variants: VariantOption[];
   sizes: string[];
@@ -39,13 +41,23 @@ export function ProductPurchase({
   productSlug: string;
   currency: string;
   taxNote: string | null;
+  initialSize?: string | null;
 }) {
   const [color, setColor] = useState<string | null>(colors.find((c) => c.inStock)?.name ?? colors[0]?.name ?? null);
-  const [size, setSize] = useState<string | null>(null);
+  const [size, setSize] = useState<string | null>(
+    initialSize && sizes.includes(initialSize) ? initialSize : null,
+  );
   const [qty, setQty] = useState(1);
   const [status, setStatus] = useState<'idle' | 'saving'>('idle');
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const { toast, openDrawer } = useCart();
+
+  // Colour choice drives the storefront gallery too, so the shopper always sees the
+  // garment in the colourway they are actually buying.
+  useEffect(() => {
+    if (!color) return;
+    window.dispatchEvent(new CustomEvent('kb:gallery-colour', { detail: { colour: color } }));
+  }, [color]);
 
   const inColor = useMemo(
     () => variants.filter((v) => (color == null ? true : v.color === color)),

@@ -14,7 +14,7 @@ import * as env from '@/lib/env.ts';
 ensureDb();
 export const dynamic = 'force-dynamic';
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<Record<string, string | undefined>> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -39,8 +39,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const query = await searchParams;
+  const initialSize = typeof query.size === 'string' ? query.size.slice(0, 12) : null;
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
@@ -146,6 +148,7 @@ export default async function ProductPage({ params }: Props) {
             productSlug={product.slug}
             currency={product.currency}
             taxNote={taxNote}
+            initialSize={initialSize}
           />
         </div>
       </article>

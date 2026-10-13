@@ -13,7 +13,26 @@ const POLICY_LINKS: [string, string][] = [
   ['/policies/terms', 'Terms'],
 ];
 
-export function NavSheet({ categories }: { categories: { slug: string; name: string }[] }) {
+type NavCategory = { slug: string; name: string; parent_slug: string | null; product_count: number };
+
+export function NavSheet({ categories }: { categories: NavCategory[] }) {
+  // Roots first, each followed by its non-empty children, so the mobile menu mirrors
+  // the desktop tree instead of dumping a flat list.
+  const links: { href: string; label: string; sub?: boolean }[] = [
+    { href: '/shop?tag=new', label: 'New Arrivals' },
+    ...categories
+      .filter((c) => !c.parent_slug && c.product_count > 0)
+      .flatMap((parent) => [
+        { href: `/collections/${parent.slug}`, label: parent.name },
+        ...categories
+          .filter((kid) => kid.parent_slug === parent.slug && kid.product_count > 0)
+          .map((kid) => ({ href: `/collections/${kid.slug}`, label: kid.name, sub: true })),
+      ]),
+    { href: '/shop', label: 'Shop All' },
+    { href: '/search', label: 'Search' },
+    { href: '/account/orders', label: 'Order tracking' },
+    { href: '/account', label: 'My account' },
+  ];
   const [open, setOpen] = useState(false);
   return (
     <Dialog.Root
@@ -36,7 +55,7 @@ export function NavSheet({ categories }: { categories: { slug: string; name: str
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-overlay bg-ink/35 backdrop-blur-[2px] data-[state=open]:animate-fade-in" />
-        <Dialog.Content className="fixed inset-y-0 left-0 z-drawer flex w-[min(340px,86vw)] flex-col border-r border-stone-200 bg-ivory-50 shadow-lift outline-none data-[state=open]:animate-fade-in">
+        <Dialog.Content className="fixed inset-y-0 left-0 z-drawer flex w-[min(340px,86vw)] flex-col border-r border-line bg-ivory-50 shadow-card outline-none data-[state=open]:animate-fade-in">
           <div className="flex items-center justify-between border-b border-stone-200 px-5 py-4">
             <Dialog.Title className="font-display text-[17px]">Menu</Dialog.Title>
             <Dialog.Close asChild>
@@ -48,20 +67,14 @@ export function NavSheet({ categories }: { categories: { slug: string; name: str
           <Dialog.Description className="sr-only">Site navigation, search and account links</Dialog.Description>
           <nav className="flex-1 overflow-y-auto px-5 py-4" aria-label="Mobile">
             <ul className="space-y-1">
-              {[
-                { href: '/shop', label: 'Shop all' },
-                ...categories.map((c) => ({ href: `/collections/${c.slug}`, label: c.name })),
-                { href: '/search', label: 'Search' },
-                { href: '/about', label: 'About' },
-                { href: '/contact', label: 'Contact' },
-                { href: '/faq', label: 'Help & FAQs' },
-                { href: '/account', label: 'My account' },
-              ].map((item) => (
+              {links.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="block border-b border-stone-200/70 py-3 font-display text-[21px] leading-tight text-ink transition hover:translate-x-1 hover:text-ink-500"
+                    className={`block border-b border-line py-3 leading-tight text-ink transition hover:translate-x-1 hover:text-ink-500 ${
+                      item.sub ? 'pl-4 font-sans text-[15px] text-ink-500' : 'font-display text-[20px]'
+                    }`}
                   >
                     {item.label}
                   </Link>

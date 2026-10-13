@@ -1,223 +1,345 @@
 import Link from 'next/link';
 import { ensureDb } from '@/lib/bootstrap.ts';
-import { listProducts } from '@/domain/catalog.ts';
-import { ProductCard } from '@/components/product/product-card.tsx';
-import { WordmarkLockup } from '@/components/site/wordmark.tsx';
-import { Badge, ReviewBadge } from '@/components/ui/badge.tsx';
+import { listCategories, listProducts } from '@/domain/catalog.ts';
 import { settingsForUi } from '@/domain/settings.ts';
-import { runtimeBanner } from '@/lib/banner.ts';
-import { formatMoney } from '@/domain/money.ts';
-
-export const dynamic = 'force-dynamic';
+import { ShopGrid } from '@/components/product/shop-grid.tsx';
+import { NewsletterForm } from '@/components/site/newsletter-form.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
+import * as env from '@/lib/env.ts';
 
 ensureDb();
+export const dynamic = 'force-dynamic';
+
+/**
+ * Homepage.
+ *
+ * Section order follows the brand brief: hero → shop by category → featured → editorial
+ * campaign → new arrivals → brand story → newsletter (the announcement bar, header and
+ * footer live in the root layout). Every number, image, price and link on this page is
+ * read from the catalogue at request time — nothing here is a hardcoded mock, so when the
+ * owner replaces the demo rows this page re-lays itself out around the real range.
+ *
+ * Deliberately absent: a founding year, a manufacturing origin, a sustainability claim, a
+ * "bestseller"/"trending" label, invented delivery promises and any accessories or
+ * women's content. There is nothing in the data to support those, and an unsupported claim
+ * on a pre-launch store is the kind of thing that has to be un-found later.
+ */
+
+function SectionHead({
+  eyebrow,
+  title,
+  copy,
+  action,
+}: {
+  eyebrow: string;
+  title: string;
+  copy?: string;
+  action?: { href: string; label: string };
+}) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+      <div className="max-w-2xl">
+        <p className="eyebrow">{eyebrow}</p>
+        <h2 className="display-section mt-3">{title}</h2>
+        {copy ? <p className="mt-4 text-[14.5px] leading-relaxed text-ink-500">{copy}</p> : null}
+      </div>
+      {action ? (
+        <Link href={action.href} className="btn-outline shrink-0">
+          {action.label}
+        </Link>
+      ) : null}
+    </div>
+  );
+}
 
 export default async function HomePage() {
-  const featured = listProducts({ perPage: 8, sort: 'featured', categorySlug: null });
-  const editorial = listProducts({ perPage: 4, sort: 'newest' });
-  const s = settingsForUi();
-  const banner = runtimeBanner();
+  const settings = settingsForUi();
+  const categories = listCategories({ includeSamples: env.demoCatalogueEnabled });
+  const roots = categories.filter((c) => !c.parent_slug && c.product_count > 0);
+
+  const featured = listProducts({
+    tag: 'featured',
+    sort: 'featured',
+    perPage: 4,
+    includeSamples: env.demoCatalogueEnabled,
+  });
+  const fresh = listProducts({
+    tag: 'new',
+    sort: 'newest',
+    perPage: 4,
+    includeSamples: env.demoCatalogueEnabled,
+  });
+  const allRange = listProducts({ sort: 'featured', perPage: 12, includeSamples: env.demoCatalogueEnabled });
+
+  // One representative image per category, taken from the products in that category
+  // rather than from a path written into this component.
+  const tiles = await Promise.all(
+    roots.slice(0, 6).map(async (c) => {
+      const lead = listProducts({
+        categorySlug: c.slug,
+        perPage: 1,
+        sort: 'featured',
+        includeSamples: env.demoCatalogueEnabled,
+      }).items[0];
+      return { ...c, image: lead?.primaryImage ?? null, leadSlug: lead?.slug ?? null };
+    }),
+  );
+
+  // The editorial campaign has to sell something real: pull the linen range and link the
+  // two strongest pieces by handle, falling back to whatever the category actually holds.
+  const linen = listProducts({
+    categorySlug: 'linen-shirts',
+    perPage: 3,
+    sort: 'newest',
+    includeSamples: env.demoCatalogueEnabled,
+  }).items;
+  const campaignProduct = linen[0] ?? allRange.items[0] ?? null;
+  const campaignSecondary = linen[1] ?? allRange.items[1] ?? null;
+
+  const hero = campaignProduct ?? allRange.items[0] ?? null;
+  const heroImage = hero?.primaryImage?.endsWith('.jpg') ? hero.primaryImage : '/media/demo/pure-linen-shirt.jpg';
+
   return (
     <>
-      {/* HERO */}
-      <section className="relative overflow-hidden border-b border-stone-200 bg-ivory-200/50">
-        <div className="container grid gap-10 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-24">
-          <div className="reveal max-w-2xl">
-            <p className="eyebrow">Autumn / Winter · Sample catalogue</p>
-            <h1 className="display-hero mt-4">
-              Considered
-              <br />
-              menswear for
-              <br />
-              <em className="font-normal italic text-ink-500">the working week.</em>
-            </h1>
-            <p className="mt-6 max-w-md text-[15px] leading-relaxed text-ink-500">
-              K-brands builds a restrained wardrobe: shirts that hold a collar, trousers that move, and knitwear fine
-              enough for an air-conditioned office. {s.tagline ? `${s.tagline}.` : ''}
+      {/* ── 1. Hero ───────────────────────────────────────────────────────────────── */}
+      <section className="border-b border-line">
+        <div className="container grid gap-0 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
+          <div className="flex flex-col justify-center py-12 lg:py-24 lg:pr-14">
+            <p className="eyebrow">{settings.tagline ?? 'Premium contemporary menswear'}</p>
+            <h1 className="display-hero mt-5 max-w-[15ch]">Clothes for the working week.</h1>
+            <p className="mt-6 max-w-[46ch] text-[15.5px] leading-relaxed text-ink-500">
+              Linen that behaves in humidity, oxford that survives a commute, poplin that
+              presses clean. {allRange.total} {allRange.total === 1 ? 'piece' : 'pieces'} cut for men
+              in Indian cities, priced in rupees, delivered across India.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link href="/shop" className="btn-solid">
-                Shop all
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link href="/shop?tag=new" className="btn-solid">
+                Shop New Arrivals
               </Link>
               <Link href="/collections/shirts" className="btn-outline">
-                The shirt edit
+                Explore Shirts
               </Link>
             </div>
-            <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-2 text-[12px] text-ink-400">
-              <span>India-first delivery</span>
-              <span aria-hidden="true">·</span>
-              <span>Prices in {s.currency}</span>
-              <span aria-hidden="true">·</span>
-              <span>Size guide for every style</span>
-            </div>
+            <p className="mt-10 flex flex-wrap items-center gap-2.5 text-[12.5px] leading-relaxed text-ink-400">
+              <Badge tone="outline">Demo storefront</Badge>
+              Catalogue, imagery and prices are development placeholders. No orders are dispatched from this build.
+            </p>
           </div>
-          <div className="relative">
-            <div className="product-frame aspect-[4/5] w-full overflow-hidden border border-stone-200 lg:aspect-[4/4.4]">
+
+          <figure className="relative -mx-5 lg:mx-0">
+            <div className="product-frame relative aspect-[3/4] w-full overflow-hidden sm:aspect-[4/3] lg:aspect-auto lg:h-full lg:min-h-[560px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/media/sample/the-daily-oxford-shirt/0.svg"
-                alt="Sample artwork: the Daily Oxford Shirt — illustration, not product photography"
-                width={700}
-                height={950}
-                className="h-full w-full object-cover"
+                src={heroImage}
+                alt={
+                  hero
+                    ? `Demo visual: ${hero.title}. Labelled demonstration imagery, not verified product photography.`
+                    : 'Demo visual — labelled demonstration imagery'
+                }
+                width={900}
+                height={1200}
+                loading="eager"
                 fetchPriority="high"
+                decoding="async"
+                className="h-full w-full object-cover"
               />
             </div>
-            <div className="absolute -bottom-4 left-4 max-w-[240px] border border-stone-200 bg-white/95 px-4 py-3 shadow-card backdrop-blur">
-              <p className="eyebrow">Featured sample</p>
-              <p className="mt-1 font-display text-[16px] leading-snug">The Daily Oxford Shirt</p>
-              <p className="mt-1 text-[13px] tabular-nums text-ink-600">{formatMoney(340000)}</p>
-              <Link href="/product/the-daily-oxford-shirt" className="mt-2 inline-block text-[12px] tracking-label text-ink underline-offset-4 hover:underline">
-                View product
+            <figcaption className="absolute bottom-4 left-4 bg-canvas/90 px-2.5 py-1 text-[11.5px] text-ink-500">
+              Demo imagery — not product photography
+            </figcaption>
+            {hero ? (
+              <Link
+                href={`/product/${hero.slug}`}
+                className="absolute bottom-4 right-4 bg-canvas/90 px-3 py-1.5 text-[12.5px] text-ink transition hover:bg-canvas"
+              >
+                View {hero.title}
               </Link>
-            </div>
-          </div>
+            ) : null}
+          </figure>
         </div>
       </section>
 
-      {banner ? (
-        <section className="border-b border-stone-200 bg-sand-100/60">
-          <div className="container flex flex-wrap items-center gap-3 py-3.5 text-[12.5px] leading-relaxed text-ink-600">
-            <Badge tone="warn">Not live yet</Badge>
-            <span>{banner}</span>
+      {/* ── 2. Shop by category ───────────────────────────────────────────────────── */}
+      {tiles.length > 0 ? (
+        <section className="container py-16 lg:py-24">
+          <SectionHead
+            eyebrow="The range"
+            title="Shop by category"
+            copy="Six doors, each one populated by the current catalogue. Empty categories are not shown rather than being kept as placeholders."
+            action={{ href: '/shop', label: 'Shop all' }}
+          />
+          <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3">
+            {tiles.map((t) => (
+              <Link key={t.slug} href={`/collections/${t.slug}`} className="group block">
+                <div className="product-frame relative aspect-[4/5] w-full overflow-hidden">
+                  {t.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={t.image}
+                      alt={`Demo visual for ${t.name}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-editorial group-hover:scale-[1.03]"
+                    />
+                  ) : (
+                    <div className="grid h-full place-items-center px-4 text-center">
+                      <span className="font-display text-[20px] text-ink-600">{t.name}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3.5 flex items-baseline justify-between gap-3 border-t border-line pt-3">
+                  <h3 className="font-display text-[17px] leading-snug group-hover:text-ink-500">{t.name}</h3>
+                  <span className="shrink-0 text-[12px] text-ink-400">
+                    {t.product_count} {t.product_count === 1 ? 'style' : 'styles'}
+                  </span>
+                </div>
+                {t.description ? (
+                  <p className="mt-1.5 line-clamp-2 text-[12.5px] leading-relaxed text-ink-400">{t.description}</p>
+                ) : null}
+              </Link>
+            ))}
           </div>
         </section>
       ) : null}
 
-      {/* VALUE STRIP */}
-      <section className="border-b border-stone-200 bg-white/50">
-        <div className="container grid gap-x-8 gap-y-6 py-8 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            { t: 'Cut for the desk', d: 'Regular and tailored fits drafted around a commute, a meeting and a dinner after.' },
-            { t: 'Fabric first', d: 'Composition and care are stated on every product page — no vague adjectives.' },
-            { t: 'Sizing you can trust', d: 'Measured size guides per garment type, not a generic chart.' },
-            { t: 'Built to be returned', d: 'Return and exchange rules will be published here once approved by the owner.' },
-          ].map((item) => (
-            <div key={item.t}>
-              <h2 className="font-display text-[16px] leading-snug">{item.t}</h2>
-              <p className="mt-1.5 text-[13px] leading-relaxed text-ink-500">{item.d}</p>
+      {/* ── 3. Featured ───────────────────────────────────────────────────────────── */}
+      {featured.items.length > 0 ? (
+        <section className="border-y border-line bg-white/60">
+          <div className="container py-16 lg:py-24">
+            <SectionHead
+              eyebrow="Chosen by the studio"
+              title="Featured pieces"
+              copy="Marked in the catalogue, not by an algorithm — and every price below is the price the checkout will charge."
+              action={{ href: '/shop?sort=featured', label: 'See all featured' }}
+            />
+            <div className="mt-10">
+              <ShopGrid items={featured.items} dense />
             </div>
-          ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/* ── 4. Editorial campaign, linked to real products ──────────────────────────── */}
+      {campaignProduct ? (
+        <section className="container py-16 lg:py-24">
+          <div className="grid items-center gap-10 border border-line bg-stone-100/70 p-6 sm:p-10 lg:grid-cols-2 lg:gap-16">
+            <div>
+              <p className="eyebrow">The linen file</p>
+              <h2 className="display-section mt-3 max-w-[18ch]">
+                One shirt for the whole week, if you only bring one.
+              </h2>
+              <p className="mt-5 max-w-[52ch] text-[14.5px] leading-relaxed text-ink-500">
+                Worn open over a tee, tucked under a blazer, washed often and softer for it. The
+                linen range is the smallest part of this catalogue and the reason most people find
+                the label — so it is where we started.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href={`/product/${campaignProduct.slug}`} className="btn-solid">
+                  Shop the linen shirt
+                </Link>
+                {campaignSecondary ? (
+                  <Link href={`/product/${campaignSecondary.slug}`} className="btn-outline">
+                    Or the knit polo
+                  </Link>
+                ) : null}
+                <Link href="/collections/linen-shirts" className="btn-quiet">
+                  All linen shirts
+                </Link>
+              </div>
+            </div>
+            <figure className="product-frame relative aspect-[4/5] w-full overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={campaignProduct.primaryImage ?? `/media/sample/${campaignProduct.slug}/0.svg?garment=shirt`}
+                alt={`Demo visual: ${campaignProduct.title}`}
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
+              <figcaption className="absolute bottom-3 left-3 bg-canvas/90 px-2 py-0.5 text-[11.5px] text-ink-500">
+                Demo imagery
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+      ) : null}
+
+      {/* ── 5. New arrivals — only pieces actually flagged new ──────────────────────── */}
+      {fresh.items.length > 0 ? (
+        <section className="border-t border-line">
+          <div className="container py-16 lg:py-24">
+            <SectionHead
+              eyebrow="Just added"
+              title="New arrivals"
+              copy={`The ${fresh.total} ${fresh.total === 1 ? 'piece' : 'pieces'} the catalogue flags as new. Nothing here is dressed up as a bestseller — this store has no sales history to rank yet.`}
+              action={{ href: '/shop?tag=new&sort=newest', label: 'View all new' }}
+            />
+            <div className="mt-10">
+              <ShopGrid items={fresh.items} dense />
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* ── 6. Brand story, without invented provenance ────────────────────────────── */}
+      <section className="border-y border-line bg-white/60">
+        <div className="container grid gap-10 py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:py-24">
+          <div>
+            <p className="eyebrow">About K-brands</p>
+            <h2 className="display-section mt-3 max-w-[16ch]">A label still being built, in the open.</h2>
+          </div>
+          <div className="max-w-[62ch] space-y-5 text-[14.5px] leading-relaxed text-ink-600">
+            <p>
+              K-brands is a contemporary menswear label for India: shirts, polos, tees, trousers,
+              denim and light layers, cut for a working week that moves between an office, a
+              restaurant and a weekend that refuses to dress up.
+            </p>
+            <p>
+              What we will not do is tell you a founding year, a mill we have not named or a
+              sustainability credential we have not documented. Those details belong to the
+              business, and the business is still confirming them. When this storefront carries
+              real records, the claims here will be the ones the records support.
+            </p>
+            <p className="text-ink-500">
+              Until then everything on this site — photography, prices, fabric compositions and
+              stock counts — is labelled demo data, and you can browse, filter and test a full
+              checkout without being charged.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              <Link href="/about" className="btn-quiet">
+                Read the full story
+              </Link>
+              <Link href="/contact" className="btn-quiet">
+                Talk to us
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* FEATURED GRID */}
-      <section className="container py-14 lg:py-20">
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      {/* ── 7. Newsletter — writes a real row, or says nothing happened ─────────────── */}
+      <section className="container py-16 lg:py-24">
+        <div className="grid gap-8 border border-line p-6 sm:p-10 lg:grid-cols-2 lg:items-center">
           <div>
-            <p className="eyebrow">The edit</p>
-            <h2 className="display-section mt-2">Pieces that carry a week</h2>
-          </div>
-          <Link href="/shop" className="text-[12px] tracking-label text-ink-500 underline-offset-4 hover:text-ink hover:underline">
-            View all {featured.total} styles
-          </Link>
-        </header>
-        {featured.items.length === 0 ? (
-          <div className="border border-dashed border-stone-300 bg-white/50 px-6 py-12">
-            <h3 className="font-display text-[22px]">The catalogue is not loaded yet</h3>
-            <p className="mt-2 max-w-prose text-[14px] leading-relaxed text-ink-500">
-              Run <code className="rounded-xs bg-stone-100 px-1.5 py-0.5 text-[12px]">npm run db:seed-demo</code> to
-              load clearly-labelled sample products, or add verified products in the admin dashboard.
+            <p className="eyebrow">Launch list</p>
+            <h2 className="display-section mt-3 max-w-[18ch]">One email when the store opens.</h2>
+            <p className="mt-4 max-w-[48ch] text-[14.5px] leading-relaxed text-ink-500">
+              No weekly digest, no discount theatre. Your address is stored in this deployment
+              with the consent text you agreed to, and you can ask us to remove it at
+              {' '}
+              {settings.supportEmail ? (
+                <a href={`mailto:${settings.supportEmail}`} className="link-underline text-ink">
+                  {settings.supportEmail}
+                </a>
+              ) : (
+                <span className="text-ink">our support address (not yet published)</span>
+              )}
+              .
             </p>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-            {featured.items.map((p, i) => (
-              <ProductCard key={p.id} product={p} priority={i < 4} />
-            ))}
+          <div className="lg:justify-self-end">
+            <NewsletterForm source="homepage" />
           </div>
-        )}
-      </section>
-
-      {/* EDITORIAL SPLIT */}
-      <section className="border-y border-stone-200 bg-ink text-ivory-100">
-        <div className="container grid gap-10 py-14 lg:grid-cols-2 lg:items-center lg:py-20">
-          <div className="max-w-xl">
-            <p className="eyebrow text-sand-300">Lookbook</p>
-            <h2 className="display-section mt-3 text-ivory-100">
-              A wardrobe of eight pieces, worn forty ways
-            </h2>
-            <p className="mt-5 text-[14.5px] leading-relaxed text-ivory-100/70">
-              Our starting range is deliberately mixed: three shirting weights, two trouser blocks, a half-canvas
-              blazer and knitwear fine enough to layer. Every record shown in this build is a labelled development
-              sample — the photography, pricing and stock are placeholders until the owner publishes verified
-              products.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/collections/wardrobe-essentials" className="btn bg-ivory-100 text-ink hover:bg-sand-200">
-                Shop essentials
-              </Link>
-              <Link href="/size-guide" className="btn border border-ivory-100/35 text-ivory-100 hover:bg-ivory-100/10">
-                Read the size guide
-              </Link>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            {editorial.items.slice(0, 4).map((p) => (
-              <Link key={p.id} href={`/product/${p.slug}`} className="group block">
-                <span className="product-frame block aspect-[4/5] overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={p.primaryImage ?? `/media/sample/${p.slug}/0.svg`}
-                    alt={`${p.title} — sample artwork`}
-                    width={600}
-                    height={750}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </span>
-                <span className="mt-2 block text-[13px] text-ivory-100/85 group-hover:text-ivory-100">{p.title}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* TRUST / DISCLOSURE */}
-      <section className="container py-14">
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
-            <h2 className="display-section">Before you order</h2>
-            <p className="mt-4 max-w-prose text-[14px] leading-relaxed text-ink-500">
-              This deployment is a working pre-launch build. It is intentionally transparent about what is and is not
-              configured yet, so no customer mistakes it for a live store.
-            </p>
-            <ul className="mt-5 space-y-2 text-[13.5px] leading-relaxed text-ink-600">
-              {[
-                ['Payment gateway', 'not selected or connected — no live card, UPI or net-banking charge is possible'],
-                ['Courier', 'provider undecided — delivery fees and dates are not quoted until configured'],
-                ['Cash on delivery', 'disabled until the owner approves it and courier support is verified'],
-                ['Returns & exchanges', 'policy pending owner approval; the workflow exists but publishes no promise'],
-                ['Seller identity', 'legal entity, GSTIN and contact details pending — not invented here'],
-              ].map(([k, v]) => (
-                <li key={k} className="flex gap-3 border-b border-stone-200 pb-2">
-                  <span className="w-40 shrink-0 text-[12px] tracking-label text-ink-400">{k}</span>
-                  <span>{v}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6">
-              <ReviewBadge label="Owner sign-off outstanding — see the launch checklist" />
-            </div>
-          </div>
-          <aside className="card p-6">
-            <WordmarkLockup />
-            <p className="mt-4 text-[13px] leading-relaxed text-ink-500">
-              Questions about this build? The admin dashboard at <code className="text-[12px]">/admin</code> shows
-              catalogue, inventory, orders and the configuration readiness report.
-            </p>
-            <div className="mt-5 flex flex-col gap-2 text-[13px]">
-              <Link href="/contact" className="link-underline w-fit">
-                Contact the team
-              </Link>
-              <Link href="/faq" className="link-underline w-fit">
-                Frequently asked questions
-              </Link>
-              <Link href="/policies/privacy" className="link-underline w-fit">
-                Privacy notice
-              </Link>
-            </div>
-          </aside>
         </div>
       </section>
     </>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function Gallery({
   images,
@@ -12,6 +12,26 @@ export function Gallery({
   const list = images.length > 0 ? images : [{ url: '/media/sample/placeholder/0.svg', alt: `${title} — sample artwork`, kind: 'placeholder' }];
   const [active, setActive] = useState(0);
   const [zoom, setZoom] = useState(false);
+
+  // The purchase panel announces the chosen colourway; jump to the frame made for it.
+  // A colourway with no photography of its own resolves to its colour-matched demo plate,
+  // which is labelled as such under the image — never to another colour's photograph.
+  useEffect(() => {
+    const onColour = (e: Event) => {
+      const colour = (e as CustomEvent<{ colour: string | null }>).detail?.colour;
+      if (!colour) return;
+      const needle = `t=${encodeURIComponent(colour)}`;
+      const idx = list.findIndex(
+        (img) => img.url.includes(needle) || new RegExp(`\\bin ${colour.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.`).test(img.alt),
+      );
+      if (idx >= 0) {
+        setActive(idx);
+        setZoom(false);
+      }
+    };
+    window.addEventListener('kb:gallery-colour', onColour);
+    return () => window.removeEventListener('kb:gallery-colour', onColour);
+  }, [list]);
   const current = list[Math.min(active, list.length - 1)]!;
   return (
     <div className="lg:sticky lg:top-24">
@@ -20,7 +40,7 @@ export function Gallery({
         onClick={() => setZoom((z) => !z)}
         aria-label={zoom ? 'Zoom out' : 'Zoom in on the image'}
         aria-pressed={zoom}
-        className="product-frame block w-full overflow-hidden border border-stone-200"
+        className="product-frame block w-full overflow-hidden border border-line"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -45,7 +65,7 @@ export function Gallery({
               aria-label={`Show image ${String(i + 1)} of ${list.length}`}
               onClick={() => setActive(i)}
               className={`product-frame relative h-[104px] w-[78px] shrink-0 overflow-hidden border transition ${
-                i === active ? 'border-ink' : 'border-stone-200 hover:border-stone-400'
+                i === active ? 'border-ink' : 'border-line hover:border-stone-400'
               }`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -54,8 +74,11 @@ export function Gallery({
           ))}
         </div>
       ) : null}
-      <p className="mt-2.5 text-[12px] tracking-label text-stone-400">
-        {current.kind === 'generated' || current.kind === 'placeholder' ? 'Sample artwork · not product photography' : 'Product image'}
+      <p className="mt-2.5 text-[12px] text-ink-400">
+        {current.kind === 'generated' || current.kind === 'placeholder'
+          ? 'Demo illustration of this colourway · not product photography'
+          : 'Demo photography · labelled, not verified product imagery'}
+        {list.length > 1 ? <span className="ml-2 text-stone-400">Frame {String(active + 1)} of {String(list.length)} · click to enlarge</span> : null}
       </p>
     </div>
   );

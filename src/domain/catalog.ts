@@ -13,6 +13,81 @@ import { discountPercent } from './money.ts';
  * *publish* a sample product into a live catalogue. See docs/sample-data.md.
  */
 
+/**
+ * CATALOGUE INTEGRITY — menswear only.
+ *
+ * K-brands sells men's clothing and nothing else. The navigation and the filter bar hide
+ * out-of-scope merchandise, but hiding is not enforcement: an admin (or a future import
+ * script) could still save a belt, a handbag or a women's shirt and it would surface on
+ * the storefront through search, "shop all" and recommendations. So the rule lives here,
+ * at the only write path the admin UI uses, and it rejects the save.
+ *
+ * The category list below is also the allowlist for the storefront navigation — a category
+ * that cannot be created cannot produce an empty nav item either.
+ */
+export const CATALOGUE_CATEGORIES = [
+  'shirts', 'linen-shirts', 'casual-shirts', 'formal-shirts',
+  'polos', 't-shirts',
+  'trousers', 'chinos', 'jeans', 'shorts',
+  'sweatshirts-knitwear', 'jackets-overshirts',
+] as const;
+
+/** Garment types the brand manufactures. Each drives a fit block and a demo plate. */
+export const CATALOGUE_GARMENTS = [
+  'shirt', 'polo', 'tee', 'trouser', 'denim', 'short', 'sweatshirt', 'knitwear', 'overshirt',
+] as const;
+
+const FORBIDDEN_COPY = [
+  'belt', 'handbag', 'tote bag', 'wallet', 'purse', 'clutch', 'watch', 'jewellery', 'jewelry',
+  'bracelet', 'necklace', 'earring', 'ring', 'shoe', 'sneaker', 'loafer', 'boot', 'sandal',
+  'footwear', 'women', 'woman', 'ladies', 'lady', 'cosmetic', 'fragrance', 'perfume', 'makeup',
+  'electronics', 'headphone', 'speaker', 'charger', 'home decor', 'cushion', 'bedding', 'mug',
+  'candle', 'scarf', 'scarves', 'stole', 'waistcoat', 'necktie', 'sock', 'beanie', 'sunglass',
+  'glove', 'keychain', 'lanyard',
+];
+
+/** Textile vocabulary that merely collides with a banned word. */
+const FORBIDDEN_ALLOW = [/ring[- ]?spun/gi, /belting/gi, /cap[- ]?sized/gi];
+
+/** Returns the first out-of-scope term found in the text, or null. */
+export function outOfScopeTerm(text: string): string | null {
+  const cleaned = FORBIDDEN_ALLOW.reduce((acc, re) => acc.replace(re, '  '), text ?? '');
+  for (const term of FORBIDDEN_COPY) {
+    if (new RegExp(`\\b${term}s?\\b`, 'i').test(cleaned)) return term;
+  }
+  return null;
+}
+
+/**
+ * @returns a human-readable reason the save must be refused, or null when it is in scope.
+ */
+export function catalogueScopeIssue(input: {
+  garment_type?: string | null;
+  category_slug?: string | null;
+  category_id?: number | null;
+  title?: string | null;
+  subtitle?: string | null;
+  description?: string | null;
+  tags?: string[];
+}): string | null {
+  if (input.garment_type) {
+    const g = String(input.garment_type).toLowerCase();
+    if (!(CATALOGUE_GARMENTS as readonly string[]).includes(g)) {
+      return `Garment type "${input.garment_type}" is outside the catalogue. K-brands lists men's clothing only: ${CATALOGUE_GARMENTS.join(', ')}.`;
+    }
+  }
+  const slug = input.category_slug ?? null;
+  if (slug && !(CATALOGUE_CATEGORIES as readonly string[]).includes(slug)) {
+    return `Category "${slug}" is not part of the approved menswear category tree.`;
+  }
+  const copy = [input.title, input.subtitle, input.description, ...(input.tags ?? [])].filter(Boolean).join(' ');
+  const term = outOfScopeTerm(copy);
+  if (term) {
+    return `Product copy mentions "${term}". Accessories, footwear, women's wear and other out-of-scope merchandise must not be listed, cross-sold or advertised.`;
+  }
+  return null;
+}
+
 export type ProductRow = {
   id: number;
   slug: string;
@@ -84,6 +159,7 @@ export function catalogVisibilityClause(opts: { includeSamples?: boolean; admin?
 function mapProduct(row: ProductRow & Record<string, unknown>): CatalogProduct {
   return {
     ...(row as unknown as ProductRow),
+    colors: [],
     isSample: row.is_sample === 1,
     priceCents: row.price_cents,
     savingsPercent: discountPercent(row.price_cents, row.compare_at_price_cents),
@@ -94,6 +170,8 @@ function mapProduct(row: ProductRow & Record<string, unknown>): CatalogProduct {
 }
 
 export type CatalogProduct = ProductRow & {
+  /** Distinct active colourways of this product, in the order they were created. */
+  colors: { name: string; hex: string | null }[];
   isSample: boolean;
   priceCents: number;
   savingsPercent: number | null;
@@ -125,6 +203,8 @@ export function listProducts(opts: {
   maxPriceCents?: number | null;
   onlyInStock?: boolean;
   garmentTypes?: string[];
+  /** product_tags value, e.g. 'new' or 'featured'. */
+  tag?: string | null;
 } = {}): { items: CatalogProduct[]; total: number; page: number; pages: number; perPage: number; sampleInView: number } {
   const { where, params } = catalogVisibilityClause(opts);
   const clauses: string[] = where ? [where.replace(/^WHERE /, '')] : [];
@@ -161,6 +241,10 @@ export function listProducts(opts: {
     clauses.push(`EXISTS (SELECT 1 FROM variants v WHERE v.product_id = p.id AND LOWER(COALESCE(v.color_name,'')) IN (${opts.colors.map(() => '?').join(',')}))`);
     args.push(...opts.colors.map((c) => c.toLowerCase()));
   }
+  if (opts.tag) {
+    clauses.push('EXISTS (SELECT 1 FROM product_tags t WHERE t.product_id = p.id AND t.tag = ?)');
+    args.push(opts.tag.toLowerCase().slice(0, 40));
+  }
   if (opts.garmentTypes?.length) {
     clauses.push(`LOWER(COALESCE(p.garment_type,'')) IN (${opts.garmentTypes.map(() => '?').join(',')})`);
     args.push(...opts.garmentTypes.map((g) => g.toLowerCase()));
@@ -183,6 +267,25 @@ export function listProducts(opts: {
     [...args, perPage, offset],
   );
   const items = rows.map(mapProduct);
+  if (items.length > 0) {
+    const ids = items.map((i) => i.id);
+    const colourRows = all<{ product_id: number; color_name: string; color_code: string | null }>(
+      `SELECT v.product_id, v.color_name, MIN(v.color_code) AS color_code
+       FROM variants v
+       WHERE v.product_id IN (${ids.map(() => '?').join(',')})
+         AND v.status = 'active' AND v.color_name IS NOT NULL
+       GROUP BY v.product_id, v.color_name
+       ORDER BY v.product_id, MIN(v.id)`,
+      ids,
+    );
+    const byProduct = new Map<number, { name: string; hex: string | null }[]>();
+    for (const row of colourRows) {
+      const list = byProduct.get(row.product_id) ?? [];
+      list.push({ name: row.color_name, hex: row.color_code });
+      byProduct.set(row.product_id, list);
+    }
+    for (const item of items) item.colors = byProduct.get(item.id) ?? [];
+  }
   return {
     items,
     total,
@@ -312,8 +415,10 @@ export function facetCounts(opts: { categorySlug?: string | null; includeSamples
   const { where, params } = catalogVisibilityClause(opts);
   const base: string[] = where ? [where.replace(/^WHERE /, '')] : [];
   if (opts.categorySlug) {
-    base.push('c.slug = ?');
-    params.push(opts.categorySlug);
+    // Same rule as the listing: a parent category contains its subcategories, or the
+    // facet rail would contradict the grid it sits next to.
+    base.push('(c.slug = ? OR c.parent_id = (SELECT id FROM categories WHERE slug = ?))');
+    params.push(opts.categorySlug, opts.categorySlug);
   }
   const fromBase = 'FROM products p LEFT JOIN categories c ON c.id = p.category_id';
   const joinVariants = 'JOIN variants v ON v.product_id = p.id AND v.status = \'active\'';
@@ -398,6 +503,10 @@ export function upsertProduct(
     );
   }
   if (input.price_cents < 0) throw new AppError('validation_error', 'Price must be zero or greater.', 400);
+
+  // Men's clothing only, enforced server-side so it survives any admin form or import.
+  const scopeIssue = catalogueScopeIssue(input);
+  if (scopeIssue) throw new AppError('validation_error', scopeIssue, 400);
 
   return transaction(() => {
     const existing = get<{ id: number }>('SELECT id FROM products WHERE slug = ?', [input.slug]);

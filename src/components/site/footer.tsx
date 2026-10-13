@@ -7,11 +7,15 @@ const GROUPS: { title: string; links: { href: string; label: string }[] }[] = [
   {
     title: 'Shop',
     links: [
-      { href: '/shop', label: 'Shop all' },
+      { href: '/shop?tag=new', label: 'New arrivals' },
       { href: '/collections/shirts', label: 'Shirts' },
-      { href: '/collections/trousers', label: 'Trousers' },
-      { href: '/collections/knitwear', label: 'Knitwear' },
-      { href: '/collections/blazers-jackets', label: 'Blazers & jackets' },
+      { href: '/collections/polos', label: 'Polo t-shirts' },
+      { href: '/collections/t-shirts', label: 'T-shirts' },
+      { href: '/collections/trousers', label: 'Trousers, chinos & shorts' },
+      { href: '/collections/jeans', label: 'Jeans' },
+      { href: '/collections/sweatshirts-knitwear', label: 'Sweatshirts & knitwear' },
+      { href: '/collections/jackets-overshirts', label: 'Jackets & overshirts' },
+      { href: '/shop', label: 'Shop all' },
       { href: '/search', label: 'Search' },
     ],
   },
@@ -22,10 +26,11 @@ const GROUPS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: '/contact', label: 'Contact us' },
       { href: '/size-guide', label: 'Size guide' },
       { href: '/account/orders', label: 'Order tracking' },
+      { href: '/about', label: 'About K-brands' },
     ],
   },
   {
-    title: 'Policies',
+    title: 'Policies (draft)',
     links: [
       { href: '/policies/shipping', label: 'Shipping' },
       { href: '/policies/returns', label: 'Returns & exchanges' },
@@ -41,7 +46,7 @@ export function SiteFooter() {
   const s = settingsForUi();
   const identityIncomplete = !s.legalEntityName || !s.supportEmail;
   return (
-    <footer className="mt-20 border-t border-stone-200 bg-ivory-200/60">
+    <footer className="mt-20 border-t border-line bg-ivory-200/60">
       <div className="container py-12 lg:py-16">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div className="max-w-sm">
@@ -49,9 +54,9 @@ export function SiteFooter() {
             <p className="mt-4 text-[13px] leading-relaxed text-ink-500">
               {s.tagline ?? 'Contemporary menswear built around the working week.'}
             </p>
-            <p className="mt-4 text-[12px] leading-relaxed text-ink-400">
-              Currently in pre-launch build: sample catalogue, no payment provider connected, shipping and returns
-              settings awaiting owner approval.
+            <p className="mt-4 text-[12.5px] leading-relaxed text-ink-400">
+              Pre-launch build: the catalogue is demo data, no payment provider is connected, and shipping, returns
+              and legal text are awaiting owner approval. Policy pages below are drafts, not commitments.
             </p>
             {identityIncomplete ? (
               <div className="mt-4">
@@ -80,7 +85,7 @@ export function SiteFooter() {
             </nav>
           ))}
         </div>
-        <div className="mt-12 flex flex-col gap-3 border-t border-stone-200 pt-6 text-[11.5px] leading-relaxed text-ink-400 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-[11.5px] leading-relaxed text-ink-400 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} K-brands. All rights reserved.</p>
           <p>
             Prices in {s.currency}. Delivery within India only at this stage.{' '}

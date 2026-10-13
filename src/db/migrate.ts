@@ -515,6 +515,25 @@ push(
    CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token_hash);`,
 );
 
+/* ---------------------------------------------------- 005 newsletter subscribers */
+push(
+  'newsletter-subscribers',
+  `
+CREATE TABLE newsletter_subscribers (
+  id INTEGER PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL DEFAULT 'subscribed' CHECK (status IN ('subscribed','unsubscribed','bounced')),
+  source TEXT NOT NULL DEFAULT 'homepage',
+  consent_text TEXT NOT NULL,
+  consent_at TEXT NOT NULL,
+  ip_hash TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX idx_newsletter_status ON newsletter_subscribers(status, created_at);
+`,
+);
+
 export const migrations = M;
 
 export function runMigrations(): { applied: number; total: number; versions: number[] } {
