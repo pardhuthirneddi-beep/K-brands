@@ -57,7 +57,7 @@ const GROUPS: { title: string; intro?: string; keys: { key: string; label: strin
     keys: [
       { key: 'payment.provider', label: 'Provider', kind: 'string', hint: 'Adapter must exist in src/adapters/payment.ts and be selected via KBRANDS_PAYMENT_PROVIDER.' },
       { key: 'payment.live_enabled', label: 'Live payments', kind: 'boolean', hint: 'Env-controlled (KBRANDS_LIVE_PAYMENTS) — refusing to flip it here is deliberate, since it moves real money.' },
-      { key: 'payment.methods', label: 'Methods offered', kind: 'list', hint: 'e.g. upi, cards, netbanking, wallets' },
+      { key: 'payment.methods', label: 'Methods offered', kind: 'list', hint: 'e.g. upi, cards, netbanking, wallets' }, // guard-allow: payment method names, not merchandise
       { key: 'cod.enabled', label: 'Cash on delivery', kind: 'boolean' },
       { key: 'cod.min_order_cents', label: 'COD minimum order (paise)', kind: 'number' },
       { key: 'cod.fee_cents', label: 'COD handling fee (paise)', kind: 'number' },

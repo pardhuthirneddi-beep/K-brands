@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export function Gallery({
   images,
@@ -9,7 +9,14 @@ export function Gallery({
   images: { url: string; alt: string; kind: string }[];
   title: string;
 }) {
-  const list = images.length > 0 ? images : [{ url: '/media/sample/placeholder/0.svg', alt: `${title} — sample artwork`, kind: 'placeholder' }];
+  // Memoised so the colourway effect below does not re-subscribe on every render.
+  const list = useMemo(
+    () =>
+      images.length > 0
+        ? images
+        : [{ url: '/media/sample/placeholder/0.svg', alt: `${title} — demo artwork`, kind: 'placeholder' }],
+    [images, title],
+  );
   const [active, setActive] = useState(0);
   const [zoom, setZoom] = useState(false);
 

@@ -83,6 +83,7 @@ export function catalogueScopeIssue(input: {
   const copy = [input.title, input.subtitle, input.description, ...(input.tags ?? [])].filter(Boolean).join(' ');
   const term = outOfScopeTerm(copy);
   if (term) {
+    // guard-allow: this string is the refusal message that enforces the rule, not merchandise copy
     return `Product copy mentions "${term}". Accessories, footwear, women's wear and other out-of-scope merchandise must not be listed, cross-sold or advertised.`;
   }
   return null;
