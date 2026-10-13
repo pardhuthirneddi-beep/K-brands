@@ -449,6 +449,12 @@ export function facetCounts(opts: { categorySlug?: string | null; includeSamples
   return { sizes, colors, garments, priceMinCents: price?.min ?? 0, priceMaxCents: price?.max ?? 0 };
 }
 
+/**
+ * Category rows with the number of storefront-visible products they *contain*, which for a
+ * parent means its own products plus every subcategory — the same subtree rule the listing
+ * and the facet rail use. Counting only direct assignments made "Shirts" look empty and
+ * dropped it out of the navigation it is supposed to lead.
+ */
 export function listCategories(opts: { includeSamples?: boolean } = {}) {
   // Products are counted through a correlated subquery, so the storefront visibility rule
   // (published, and no samples unless allowed) belongs *inside* it — the outer row is a
@@ -463,7 +469,10 @@ export function listCategories(opts: { includeSamples?: boolean } = {}) {
     product_count: number;
   }>(
     `SELECT c.slug, c.name, c.description, pc.slug AS parent_slug,
-            (SELECT COUNT(*) FROM products p WHERE p.category_id = c.id ${productFilter}) AS product_count
+            (SELECT COUNT(*) FROM products p
+              WHERE (p.category_id = c.id
+                     OR p.category_id IN (SELECT k.id FROM categories k WHERE k.parent_id = c.id))
+                    ${productFilter}) AS product_count
      FROM categories c LEFT JOIN categories pc ON pc.id = c.parent_id
      ORDER BY COALESCE(c.sort_order, 99), c.name`,
     [],
