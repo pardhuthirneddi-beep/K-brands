@@ -1,22 +1,35 @@
 # Brand assets
 
-**Read this first: there is no supplied brand asset in this repository.** The tracked history starts
-with a one-line `README.md` (`fc26a90`), and no logo file, brand sheet or font licence was ever
-committed here. Everything below is therefore *proposed, implemented and internally consistent*, but
-it is **not owner-approved identity** — `tailwind.config.ts` says so in its header comment too. The
-swap-in point for the real asset is one component and one config block.
+**The logo is the owner's; the rest is still pending sign-off.** The owner supplied a reference badge
+(a gold `K` with an eagle cut through it, on a dark meshed disc, with a wordmark and tagline set
+underneath). The mark is implemented from it; the palette and type below remain *proposed and
+internally consistent*, and `tailwind.config.ts` says so in its header comment.
 
 ## The mark
 
-* `src/components/site/wordmark.tsx` — a **type-based** wordmark: a square `K` block plus "K-brands"
-  set in the display face, with `tone="ink" | "ivory"` so it inverts on dark bands. It is a component,
-  not a bitmap: it scales, inherits colour, costs no request, and reads as text to a screen reader.
-* `public/icon.svg` — the same `K` block as a 214-byte SVG, used only as the favicon. Added in
-  `adff4e1` as a stand-in.
-* Nothing else in the tree draws the brand mark. To replace it: put the supplied file in
-  `public/brand/` and point `Wordmark` at it.
-* **Do not recolour a supplied logo** to suit a surface. Use the dark artwork on the light canvas and
-  the light artwork on ink, which is what the type-based mark already does.
+| File | What it is |
+| --- | --- |
+| `public/brand/mark.svg` | The badge: a gold `K`, an eagle cut across it, a dark disc with the mesh texture. Used in the header, the footer and any lockup at 28px or larger. |
+| `public/brand/mark-tiny.svg` | The same silhouette with the mesh and the feather cuts removed, for 16-24px. Detail is what turns a mark into a smudge at favicon size. |
+| `public/icon.svg` | The tiny variant, served as the favicon. |
+| `src/components/site/wordmark.tsx` | Places the artwork beside the name and sets the tone of the *text*. It does not draw the mark and does not tint it. |
+
+Three decisions the owner can overrule:
+
+* **The artwork is never recoloured per surface.** The disc is dark, so it holds on the ivory canvas as
+  well as on ink, and `tone="ivory"` changes only the wordmark text. A logo that adapts its palette to
+  the background is two logos.
+* **The wordmark and tagline set underneath the badge in the reference are not re-typeset on the site.**
+  The owner asked for the mark and said the content below it can be ignored, so the lockup stays
+  "K-brands" with the site's own strapline rather than the reference's lettering.
+* **These are vector renditions in the spirit of the reference, not a trace of it.** The reference arrived
+  as a JPEG in the chat and never entered the repository, so the exact curves, the gold and any registry
+  marks are not here. If a master vector (AI/SVG/EPS) exists, ship it in `public/brand/` under these two
+  names and nothing else has to change - the components read the path, not the artwork.
+
+The logo's gold and cream belong to the **artwork**, not to the palette below: they are not available as
+`text-*` / `bg-*` utilities and no interface element borrows them. A gold accent in the UI would be a
+palette decision to make deliberately - this system keeps one accent.
 
 ## Colour
 

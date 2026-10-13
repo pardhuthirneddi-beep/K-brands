@@ -14,6 +14,7 @@ import { readUser } from '@/lib/session.ts';
 import { readCartKey } from '@/lib/session.ts';
 import { countItems } from '@/domain/cart.ts';
 import { runtimeBanner } from '@/lib/banner.ts';
+import { OwnerDemoAccess } from '@/components/site/owner-demo-access.tsx';
 import { CartDrawer } from '@/components/cart/cart-drawer.tsx';
 import { ensureDb } from '@/lib/bootstrap.ts';
 
@@ -66,6 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {banner}
             </div>
           ) : null}
+          <OwnerDemoAccess isAdmin={user?.role === 'admin'} />
           <SiteHeader cartCount={cartCount} user={user ? { name: user.fullName, role: user.role } : null} />
           {/* tabIndex makes the skip-link target focusable, so the keyboard caret actually
               lands here instead of staying at the top of the document. */}

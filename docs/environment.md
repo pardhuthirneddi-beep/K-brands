@@ -33,6 +33,17 @@ There are **no `NEXT_PUBLIC_*` variables in this project** — nothing in `src/a
 | `KBRANDS_SHIPPING_PROVIDER` / `KBRANDS_SHIPPING_API_KEY` | `none` / unset | No live label is produced without both, and never without `KBRANDS_LIVE_COMMERCE=1`. |
 | `KBRANDS_BOOTSTRAP_ADMIN_EMAIL` / `..._PASSWORD` | unset | The only way an admin exists. Password must be ≥ 14 chars. No default password anywhere. |
 
+**Demo shortcut for the owner area.** While `KBRANDS_DEMO_CATALOGUE=1` *and* `KBRANDS_LIVE_COMMERCE=0`, the
+storefront shows a bar offering one-click sign-in as that bootstrap account (`POST /api/auth/demo-owner`),
+so a reviewer can reach `/admin` without being handed a password out of band. The button carries no
+credential — the server reads the two variables above, authenticates through the normal `authenticate()`
+path, refuses an account that is not an admin, rate limits against the login rule, and audits
+`auth.demo_owner_login`. Setting `KBRANDS_LIVE_COMMERCE=1` removes the bar and makes the route 404, so
+there is nothing to remember to switch off before launch. Both states are pinned by
+`tests/unit/demo-owner-access.test.ts`, which runs the gate in a child process per environment. The gate
+itself is the derived constant `demoOwnerAccessEnabled` in `src/lib/env.ts`, computed at module load from
+the two flags — it is not a UI preference and cannot be turned on from a page.
+
 ## Limits and timers
 
 | Name | Default |

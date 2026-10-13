@@ -20,7 +20,10 @@ npm run dev               # http://localhost:3000
 
 Admin: `/admin`, signed in with the account from `KBRANDS_BOOTSTRAP_ADMIN_EMAIL` /
 `..._PASSWORD` in your `.env.local` (see `docs/environment.md`). There is no committed credential and
-no default password.
+no default password. While the build declares itself a demo (`KBRANDS_DEMO_CATALOGUE=1`,
+`KBRANDS_LIVE_COMMERCE=0`) the storefront also offers that account as a single click in the bar above the
+header, so a walkthrough does not need the password handed to it; the click sends no credential and the
+route 404s in every other kind of build.
 
 ## Check it
 
@@ -43,13 +46,15 @@ npm run audit:guard   # scope + demo/production data guard
 | `scripts/` | seed, guarded reset, production-data audit |
 | `tests/` | unit, integration, e2e smoke |
 | `public/media/` | product photography, per `docs/product-imagery.md` |
+| `public/brand/` | the logo mark, per `docs/brand-assets.md` |
 
 ## Read before changing anything
 
 * `docs/sample-data.md` — how the demo catalogue is marked, pruned and replaced.
 * `docs/product-imagery.md` — the photograph-per-colourway rule that decides what is purchasable.
 * `docs/responsive-and-accessibility.md` — the enforced contract, and what has *not* been measured.
-* `docs/brand-assets.md` — palette, type, wordmark, and which claims are deliberately absent.
+* `docs/brand-assets.md` — the logo artwork and its files, palette, type, and which claims are
+  deliberately absent.
 * `docs/security.md` — what is enforced server-side, and the accepted CSP residual risk.
 * `docs/environment.md` — every switch and its safe default.
 * `docs/database.md` · `docs/deployment.md` · `docs/integrations.md`.

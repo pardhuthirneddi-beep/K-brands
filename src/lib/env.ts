@@ -34,6 +34,16 @@ export const livePaymentsAvailable =
 /** COD is opt-in only; never inferred from gateway or courier choice. */
 export const codEnabled = flag(process.env.KBRANDS_COD_ENABLED, false);
 
+/**
+ * Whether a build may hand the owner area over at the click of a button (see
+ * `src/app/api/auth/demo-owner/route.ts`). The gate is the demo pair of switches: the catalogue is
+ * explicitly demo data *and* live commerce is off - the state `docs/environment.md` describes as "a
+ * demo deployment, or a development machine". It is a policy on config, not a UI preference, so it
+ * lives here with the switches it reads: the moment KBRANDS_LIVE_COMMERCE=1 the shortcut is gone, and
+ * there is nothing left to remember to remove.
+ */
+export const demoOwnerAccessEnabled = demoCatalogueEnabled && !liveCommerceEnabled;
+
 /** International destinations stay closed until operations confirm support. */
 export const internationalShippingEnabled = flag(process.env.KBRANDS_INTL_ENABLED, false);
 export const defaultCountry = str(process.env.KBRANDS_DEFAULT_COUNTRY, 'IN');

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="K-brands mark">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F7EFD6"/>
+      <stop offset=".45" stop-color="#E3C56C"/>
+      <stop offset="1" stop-color="#B98F1E"/>
+    </linearGradient>
+    <linearGradient id="cream" x1=".1" y1="0" x2=".9" y2="1">
+      <stop offset="0" stop-color="#FDFAF1"/>
+      <stop offset=".6" stop-color="#EFE0BC"/>
+      <stop offset="1" stop-color="#D9B553"/>
+    </linearGradient>
+    <pattern id="mesh" width="7" height="7" patternUnits="userSpaceOnUse">
+      <circle cx="1.6" cy="1.6" r="1.05" fill="#ffffff" fill-opacity=".055"/>
+    </pattern>
+    <radialGradient id="disc" cx=".38" cy=".3" r=".9">
+      <stop offset="0" stop-color="#1B1C1E"/>
+      <stop offset="1" stop-color="#0A0B0C"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="120" cy="120" r="119" fill="url(#disc)"/>
+  <circle cx="120" cy="120" r="119" fill="url(#mesh)"/>
+  <circle cx="120" cy="120" r="112" fill="none" stroke="#ffffff" stroke-opacity=".07"/>
+
+  <!-- the K: stem, upper arm, lower arm -->
+  <g fill="url(#gold)">
+    <polygon points="66,58 94,58 94,182 66,182"/>
+    <polygon points="104,112 152,58 186,58 124,124"/>
+    <polygon points="120,128 170,182 202,182 140,116"/>
+  </g>
+
+  <!-- the eagle, cut across the K -->
+  <path fill="url(#cream)" d="M150 74c14-6 30-4 42 5-13 1-23 5-30 12 8 1 14 4 19 9-11 2-19 6-25 13l-24 27c-9 10-21 17-35 20l18-25c-16 6-34 8-51 4l33-24c14-10 29-17 45-21-9-6-19-9-30-10 12-9 26-13 38-10z"/>
+  <!-- wing tips, cut out of the sweep so the silhouette reads at 32px too -->
+  <path fill="url(#disc)" d="M104 150c9 5 19 7 29 5l-9 15c-9 2-17 1-25-3z"/>
+  <path fill="url(#disc)" d="M124 133c9 4 18 4 27 1l-8 14c-8 2-16 1-23-2z" opacity=".9"/>
+  <circle cx="163" cy="86" r="4.6" fill="#0A0B0C"/>
+  <path d="M192 79c-6 3-10 7-13 12" stroke="#0A0B0C" stroke-width="3" stroke-linecap="round" fill="none" opacity=".5"/>
+</svg>
