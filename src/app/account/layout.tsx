@@ -1,0 +1,34 @@
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { ensureDb } from '@/lib/bootstrap.ts';
+import { readUser } from '@/lib/session.ts';
+import { AccountNav } from '@/components/account/account-nav.tsx';
+import { isAdmin } from '@/domain/auth.ts';
+
+ensureDb();
+export const dynamic = 'force-dynamic';
+
+export default async function AccountLayout({ children }: { children: React.ReactNode }) {
+  const user = await readUser();
+  if (!user) redirect('/account/login?next=/account');
+  return (
+    <div className="container py-10 lg:py-14">
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-stone-200 pb-5">
+        <div>
+          <p className="eyebrow">Your account</p>
+          <h1 className="display-section mt-1.5">Hello, {user.fullName.split(' ')[0] || 'there'}</h1>
+        </div>
+        <div className="flex items-center gap-4 text-[12.5px]">
+          {isAdmin(user) ? (
+            <Link href="/admin" className="btn-solid px-4 py-2 text-[11.5px]">Admin dashboard</Link>
+          ) : null}
+          <span className="text-ink-400">{user.email}</span>
+        </div>
+      </header>
+      <div className="grid gap-10 lg:grid-cols-[190px_1fr]">
+        <AccountNav />
+        <div>{children}</div>
+      </div>
+    </div>
+  );
+}
