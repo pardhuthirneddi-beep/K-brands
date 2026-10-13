@@ -98,14 +98,24 @@ match the product. Verdicts below are from that review.
 | `pima-pique-polo-bone.jpg` | ✓ bone polo | none | ship |
 | `two-ply-poplin-shirt.jpg` | ✓ white poplin shirt | none | ship |
 | `hero-editorial.jpg` | ✓ linen shirt, campaign band | none | ship |
-| `brushed-oxford-shirt.jpg` | ✓ light-blue oxford | **wristwatch + belt** | re-shoot |
-| `brushed-oxford-shirt-navy.jpg` | ✓ navy oxford | **belt** | re-shoot |
-| `essential-combed-tee.jpg` | ✓ black tee | **wristwatch** | re-shoot |
-| `fine-gauge-knit-polo.jpg` | ✓ charcoal polo | **wristwatch + belt** | re-shoot |
-| `pima-pique-polo.jpg` | ✓ navy polo | **wristwatch** | re-shoot |
-| `pleated-smart-trouser.jpg` | ✓ grey trousers | **belt + white sneakers** | re-shoot |
-| `slim-cotton-chino.jpg` | ✓ sand chino | **brown loafers** | re-shoot |
-| `straight-leg-denim.jpg` | ✓ indigo denim | **belt + brown boots** | re-shoot |
+| `brushed-oxford-shirt.jpg` | ✓ light-blue oxford | wristwatch + belt | **cropped**, re-shoot owed |
+| `brushed-oxford-shirt-navy.jpg` | ✓ navy oxford | belt | **cropped**, re-shoot owed |
+| `essential-combed-tee.jpg` | ✓ black tee | wristwatch | **cropped**, re-shoot owed |
+| `fine-gauge-knit-polo.jpg` | ✓ charcoal polo | wristwatch + belt | **cropped**, re-shoot owed |
+| `pima-pique-polo.jpg` | ✓ navy polo | wristwatch | **cropped**, re-shoot owed |
+| `pleated-smart-trouser.jpg` | ✓ grey trousers | belt + white sneakers | **cropped**, re-shoot owed |
+| `slim-cotton-chino.jpg` | ✓ sand chino | brown loafers | **cropped**, re-shoot owed |
+| `straight-leg-denim.jpg` | ✓ indigo denim | belt + brown boots | **cropped**, re-shoot owed |
+
+### What "cropped" means here
+
+Those eight frames were cropped from the untouched originals to a 3:4 window that excludes the
+accessory line — waist cropped out above a belt, or legs cropped out below a shoe — and re-checked by
+looking at the result. The garment is still fully in frame and still the only thing in frame. The
+originals are recoverable: this is a lossless-in-meaning, lossy-in-pixels stopgap, and the crops reduced
+those eight files to 477–702px wide, so on a 2× display the PDP frame will look slightly soft. **A real
+re-shoot at ≥1024×1365 is still owed for all eight**; cropping only removed the merchandising claim, it
+did not make these verified product photography, and the alt text still says so.
 
 **No frame is wrong about the garment** — colour and item match the listing in all 19 — which is the
 thing the previous build got wrong. The eight flagged frames are a *styling* problem: they sell a look
