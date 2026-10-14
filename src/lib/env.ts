@@ -44,6 +44,17 @@ export const codEnabled = flag(process.env.KBRANDS_COD_ENABLED, false);
  */
 export const demoOwnerAccessEnabled = demoCatalogueEnabled && !liveCommerceEnabled;
 
+/**
+ * Explicit, sandbox-only exception for Arena's cross-site iframe preview. Never enable framing or
+ * third-party cookies just because the build is a demo: it must also be running in an E2B sandbox
+ * with the preview switch set. A live store always keeps the normal clickjacking/cookie policy.
+ * `next.config.ts` reads this at build time; rebuild after changing the switch.
+ */
+export const previewEmbedEnabled =
+  flag(process.env.KBRANDS_PREVIEW_EMBED) &&
+  Boolean(process.env.E2B_SANDBOX_ID) &&
+  demoOwnerAccessEnabled;
+
 /** International destinations stay closed until operations confirm support. */
 export const internationalShippingEnabled = flag(process.env.KBRANDS_INTL_ENABLED, false);
 export const defaultCountry = str(process.env.KBRANDS_DEFAULT_COUNTRY, 'IN');

@@ -63,6 +63,6 @@ test('the same-site write check accepts the names a proxy hands us, and no other
   // be the public name while Host is the upstream one, and both must be honoured.
   const mw = read('src/middleware.ts');
   assert.match(mw, /x-forwarded-host/, 'the proxy name has to be considered, or every write is refused');
-  assert.match(mw, /x-forwarded-proto/, 'the CSRF cookie needs the same protocol rule');
+  assert.match(mw, /cookieTransportFor\(req\)/, 'the CSRF cookie must share the session transport policy');
   assert.match(mw, /Cross-origin write blocked/, 'a foreign origin must still be rejected');
 });

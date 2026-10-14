@@ -66,12 +66,16 @@ export async function confirmOrderEmail(formData: FormData) {
   if (email.length > 0 && order.user_id === null && order.guest_email && normaliseEmail(order.guest_email) === email) {
     const issuedAt = Date.now();
     const jar = await cookies();
+    // Do not lose email verification in the embedded HTTPS demo: its cookie, like the session and
+    // CSRF cookies, has to be partitioned. Outside that sandbox it keeps the normal Lax policy.
+    const forwardedProto = (await headers()).get('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
+    const secure = (forwardedProto ?? (process.env.NODE_ENV === 'production' ? 'https' : 'http')) === 'https';
+    const partitioned = env.previewEmbedEnabled && secure;
     jar.set(ORDER_VIEW_COOKIE, `${String(order.id)}.${String(issuedAt)}.${viewProof(order.id, email, issuedAt)}`, {
       httpOnly: true,
-      sameSite: 'lax',
-      // Protocol of the request, not the build: a Secure cookie set over http is silently dropped and
-      // the shopper is asked to confirm the same email again, forever.
-      secure: ((await headers()).get('x-forwarded-proto') ?? (process.env.NODE_ENV === 'production' ? 'https' : 'http')) === 'https',
+      sameSite: partitioned ? 'none' : 'lax',
+      secure,
+      partitioned,
       path: '/',
       maxAge: VIEW_TTL_SECONDS,
     });

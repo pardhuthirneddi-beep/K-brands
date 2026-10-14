@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { previewEmbedEnabled } from './src/lib/env.ts';
 
 /**
  * K-brands Next.js configuration.
@@ -8,10 +9,14 @@ import type { NextConfig } from 'next';
  *
  * CSP: see the note in the CSP block below for the one allowance this Next
  * version forces us to make, and docs/security.md. `KBRANDS_DISABLE_CSP=1`
- * disables it for local debugging only.
+ * disables it for local debugging only, except when CSP must protect an embedded preview.
  */
 const isProd = process.env.NODE_ENV === 'production';
-const cspDisabled = process.env.KBRANDS_DISABLE_CSP === '1';
+// An embedded demo must keep CSP: without X-Frame-Options, this is its frame allowlist.
+const cspDisabled = process.env.KBRANDS_DISABLE_CSP === '1' && !previewEmbedEnabled;
+const frameAncestors = previewEmbedEnabled
+  ? "frame-ancestors 'self' https://arena.ai https://*.arena.ai https://lmarena.ai https://*.lmarena.ai"
+  : "frame-ancestors 'none'";
 
 /**
  * CSP reality check for Next.js 15.5: the framework ships no nonce/`csp`
@@ -31,7 +36,7 @@ const csp = [
   "font-src 'self'",
   "connect-src 'self'",
   "form-action 'self'",
-  "frame-ancestors 'none'",
+  frameAncestors,
   "base-uri 'self'",
   "object-src 'none'",
   isProd ? 'upgrade-insecure-requests' : '',
@@ -41,7 +46,9 @@ const csp = [
 
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
-  { key: 'X-Frame-Options', value: 'DENY' },
+  // X-Frame-Options has no cross-origin allowlist. Omit it ONLY for the explicitly-gated E2B demo;
+  // CSP frame-ancestors above then allows Arena, while live stores keep DENY + 'none'.
+  ...(!previewEmbedEnabled ? [{ key: 'X-Frame-Options', value: 'DENY' }] : []),
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   {
     key: 'Permissions-Policy',

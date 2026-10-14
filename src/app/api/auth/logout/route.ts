@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { handler } from '@/lib/api.ts';
 import { revokeSession } from '@/domain/auth.ts';
-import { readUser } from '@/lib/session.ts';
+import { readUser, cookieOptionsFor } from '@/lib/session.ts';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,8 +13,9 @@ export async function POST(req: Request) {
       const user = await readUser();
       if (user) revokeSession(user.sessionId);
       const res = NextResponse.json({ ok: true });
-      res.cookies.set('kb_session', '', { path: '/', maxAge: 0 });
-      res.cookies.set('kb_csrf', '', { path: '/', maxAge: 0, httpOnly: false });
+      // A partitioned preview cookie needs the same attributes when cleared, or it survives logout.
+      res.cookies.set('kb_session', '', { ...cookieOptionsFor(req), maxAge: 0 });
+      res.cookies.set('kb_csrf', '', { ...cookieOptionsFor(req, { httpOnly: false }), maxAge: 0 });
       return res;
     },
   });

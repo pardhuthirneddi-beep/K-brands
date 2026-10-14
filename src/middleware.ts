@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { cookieTransportFor } from '@/lib/cookie-transport.ts';
 
 /**
  * Middleware responsibilities (kept deliberately thin — no DB access here so it
@@ -47,14 +48,10 @@ export function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const existing = req.cookies.get(CSRF_COOKIE)?.value;
   if (!existing || existing.length < 24) {
-    // The request's own protocol decides `Secure`; the build mode does not. Behind an http tunnel or
-    // preview proxy a Secure-marked cookie is never stored, and every later write then fails its
-    // double-submit check with an error the shopper cannot act on.
-    const proto = req.headers.get('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
-    const https = proto ? proto === 'https' : req.nextUrl.protocol === 'https:';
+    // Use the same transport policy as the session. The proxy's x-forwarded-proto decides Secure;
+    // in an HTTPS Arena iframe the CSRF token must also be partitioned or every write loses it.
     res.cookies.set(CSRF_COOKIE, randomToken(), {
-      sameSite: 'lax',
-      secure: https,
+      ...cookieTransportFor(req),
       path: '/',
       maxAge: 60 * 60 * 24 * 30,
       httpOnly: false,

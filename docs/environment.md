@@ -1,8 +1,8 @@
 # Environment configuration
 
-All runtime behaviour is configured by `KBRANDS_*` variables read in `src/lib/env.ts` (and two in
-`next.config.ts`). Nothing is committed: `.env.local` is git-ignored and a deployment must not carry
-the local copy of it.
+All runtime behaviour is configured by `KBRANDS_*` variables read in `src/lib/env.ts` (and the CSP
+debug switch in `next.config.ts`). Nothing is committed: `.env.local` is git-ignored and a deployment
+must not carry the local copy of it.
 
 There are **no `NEXT_PUBLIC_*` variables in this project** — nothing in `src/app` or
 `src/components` reads a secret, and the build would fail if one appeared.
@@ -65,8 +65,16 @@ Resolution order is in `docs/database.md`.
 
 | Name | Notes |
 | --- | --- |
-| `KBRANDS_DISABLE_CSP` | `1` removes the Content-Security-Policy header. **Local debugging only**; there is no legitimate use in a deployment. |
-| `NODE_ENV` | Drives `isProduction`: secure cookies, `upgrade-insecure-requests`, publish gating. |
+| `KBRANDS_DISABLE_CSP` | `1` removes the Content-Security-Policy header for local debugging **except** in an embedded preview, where CSP must remain to restrict framing. Never set it on a live deployment. |
+| `KBRANDS_PREVIEW_EMBED` | `1` permits the Arena iframe **only if** E2B supplies `E2B_SANDBOX_ID`, the demo catalogue is enabled and live commerce is off. Leave unset elsewhere; rebuild after changing it. |
+| `NODE_ENV` | Drives `isProduction`: `upgrade-insecure-requests`, publish gating. Cookie `Secure` follows each request's protocol, not this flag. |
+
+Arena's preview lives at `https://3000-<E2B_SANDBOX_ID>.e2b.app` and is framed from `arena.ai`.
+Without the opt-in, `X-Frame-Options: DENY` and `frame-ancestors 'none'` deliberately prevent embedding.
+With the opt-in, only Arena origins may frame it; on HTTPS, session/cart/CSRF/order-view cookies become
+`Secure; SameSite=None; Partitioned` so sign-in and add-to-bag work *inside* a cross-site iframe. The
+HTTP localhost preview retains ordinary `SameSite=Lax` cookies. Neither the frame nor cookie exception
+can be enabled in a live store.
 
 ## Listing what is configured without leaking it
 

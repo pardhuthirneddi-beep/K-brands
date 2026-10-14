@@ -22,7 +22,7 @@ half-configured gateway cannot accidentally start taking money.
 
 ## 2. Sessions, passwords, CSRF
 
-* Session cookie `kb_session`: `HttpOnly`, `SameSite=Lax`, `Path=/`, 14 days (`sessionCookieOptions`).
+* Session cookie `kb_session`: `HttpOnly`, normally `SameSite=Lax`, `Path=/`, 14 days (`sessionCookieOptions`).
   The session token is 32 random bytes (`crypto.randomBytes`); the store keeps only a hash of it, so a
   database copy does not hand over live sessions.
 * **`Secure` is decided per request, not by `NODE_ENV`.** `src/lib/cookie-transport.ts` asks the request
@@ -32,8 +32,15 @@ half-configured gateway cannot accidentally start taking money.
   browser silently discard `kb_session` and `kb_csrf`. Sign-in returned 200 with `Set-Cookie` present and
   the user still had no session, so every later write — add to bag, address, checkout — came back as
   *"Your session could not be verified. Sign out and sign in again."* Nothing in the UI was wrong, and the
-  shopper cannot act on that message. `cookieOptionsFor(req)` is now the only writer of these cookie
-  options, and `tests/unit/cookie-transport.test.ts` pins the rule.
+  shopper cannot act on that message. Session/cart routes use `cookieOptionsFor(req)` /
+  `cartCookieOptionsFor(req)`; middleware uses their shared `cookieTransportFor(req)` policy, and
+  `tests/unit/cookie-transport.test.ts` pins the rule.
+* **Embedded Arena preview only:** a non-live E2B demo with `KBRANDS_PREVIEW_EMBED=1` uses
+  `SameSite=None; Secure; Partitioned` for session, CSRF, cart and guest-order-view cookies **on HTTPS**.
+  Arena frames the e2b.app site cross-site: ordinary `Lax` cookies would never be sent in that iframe,
+  making one-click owner sign-in and add-to-bag appear broken. CHIPS partitions these cookies under the
+  Arena top-level site; the regular live store and HTTP localhost keep `Lax` unpartitioned cookies.
+  Logout clears cookies using the same attributes. See `tests/unit/preview-embed.test.ts`.
 * Sign-in **replaces** `kb_csrf` with the value stored on the new session row. The pre-login token was only
   ever written by middleware when the cookie was absent, so an existing visitor's cookie could disagree
   with the freshly created session and `verifyCsrfDoubleSubmit` would reject every write from an account
@@ -130,6 +137,14 @@ that denies camera/mic/geolocation/usb, `Cache-Control: no-store` on `/api/*`, a
 CSP is `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';
 img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; form-action 'self';
 frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests`.
+
+**Arena iframe exception:** only when `KBRANDS_PREVIEW_EMBED=1`, E2B supplies a sandbox ID, the demo
+catalogue is on and live commerce is off, `next.config.ts` omits `X-Frame-Options` (even `SAMEORIGIN`
+would block a cross-site iframe) and changes CSP's `frame-ancestors` to `'self'`, `https://arena.ai`,
+`https://*.arena.ai`, `https://lmarena.ai`, `https://*.lmarena.ai`. It never opens framing to `*`.
+CSP stays enabled in this mode even if the local-debug `KBRANDS_DISABLE_CSP=1` is set, because without
+`X-Frame-Options` CSP is the only framing boundary. A live store always retains `DENY` and `'none'`.
+These policies are checked under several separate env combinations in `tests/unit/preview-embed.test.ts`.
 
 **Accepted residual risk:** `'unsafe-inline'` in `script-src`. Next.js 15.5 exposes no
 nonce/`csp` option and the App Router bootstrap relies on inline script payloads, so a nonce policy
