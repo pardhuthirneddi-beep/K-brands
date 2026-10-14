@@ -33,13 +33,15 @@ test('with no proxy header the URL the handler ran on decides', () => {
 });
 
 test('the options handed to the cookie jar keep the security flags that are not about transport', () => {
-  const opts = cookieOptionsFor(new Request('https://kbrands.example/login'));
+  // HTTP always takes the regular first-party policy, including inside an E2B preview; HTTPS preview
+  // is deliberately different and has its own isolated-env tests in preview-embed.test.ts.
+  const opts = cookieOptionsFor(new Request('http://localhost:3000/login'));
   assert.equal(opts.httpOnly, true, 'the session cookie must stay unreadable by scripts');
   assert.equal(opts.sameSite, 'lax');
   assert.equal(opts.path, '/');
   assert.equal(opts.maxAge, sessionCookieOptions.maxAge);
   // The CSRF cookie is the one thing scripts must read, by design (double-submit).
-  assert.equal(cookieOptionsFor(new Request('https://kbrands.example/login'), { httpOnly: false }).httpOnly, false);
+  assert.equal(cookieOptionsFor(new Request('http://localhost:3000/login'), { httpOnly: false }).httpOnly, false);
   // The basket is not a credential but must survive the same transport rules.
   assert.equal(cartCookieOptionsFor(new Request('http://localhost:3000/cart')).secure, false);
 });

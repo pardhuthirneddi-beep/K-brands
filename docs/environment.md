@@ -66,12 +66,13 @@ Resolution order is in `docs/database.md`.
 | Name | Notes |
 | --- | --- |
 | `KBRANDS_DISABLE_CSP` | `1` removes the Content-Security-Policy header for local debugging **except** in an embedded preview, where CSP must remain to restrict framing. Never set it on a live deployment. |
-| `KBRANDS_PREVIEW_EMBED` | `1` permits the Arena iframe **only if** E2B supplies `E2B_SANDBOX_ID`, the demo catalogue is enabled and live commerce is off. Leave unset elsewhere; rebuild after changing it. |
+| `KBRANDS_PREVIEW_EMBED` | Automatically enabled only when E2B supplies `E2B_SANDBOX_ID`, the demo catalogue is enabled and live commerce is off. Set `0` to opt out; `1` cannot override those safety gates. Rebuild after changing it. |
 | `NODE_ENV` | Drives `isProduction`: `upgrade-insecure-requests`, publish gating. Cookie `Secure` follows each request's protocol, not this flag. |
 
 Arena's preview lives at `https://3000-<E2B_SANDBOX_ID>.e2b.app` and is framed from `arena.ai`.
-Without the opt-in, `X-Frame-Options: DENY` and `frame-ancestors 'none'` deliberately prevent embedding.
-With the opt-in, only Arena origins may frame it; on HTTPS, session/cart/CSRF/order-view cookies become
+Outside an E2B non-live demo (or when opted out), `X-Frame-Options: DENY` and
+`frame-ancestors 'none'` prevent embedding. In the E2B demo, only Arena origins may frame it;
+on HTTPS, session/cart/CSRF/order-view cookies become
 `Secure; SameSite=None; Partitioned` so sign-in and add-to-bag work *inside* a cross-site iframe. The
 HTTP localhost preview retains ordinary `SameSite=Lax` cookies. Neither the frame nor cookie exception
 can be enabled in a live store.

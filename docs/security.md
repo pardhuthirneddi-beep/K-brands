@@ -35,7 +35,7 @@ half-configured gateway cannot accidentally start taking money.
   shopper cannot act on that message. Session/cart routes use `cookieOptionsFor(req)` /
   `cartCookieOptionsFor(req)`; middleware uses their shared `cookieTransportFor(req)` policy, and
   `tests/unit/cookie-transport.test.ts` pins the rule.
-* **Embedded Arena preview only:** a non-live E2B demo with `KBRANDS_PREVIEW_EMBED=1` uses
+* **Embedded Arena preview only:** a non-live E2B demo (unless `KBRANDS_PREVIEW_EMBED=0`) uses
   `SameSite=None; Secure; Partitioned` for session, CSRF, cart and guest-order-view cookies **on HTTPS**.
   Arena frames the e2b.app site cross-site: ordinary `Lax` cookies would never be sent in that iframe,
   making one-click owner sign-in and add-to-bag appear broken. CHIPS partitions these cookies under the
@@ -138,8 +138,9 @@ CSP is `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 
 img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; form-action 'self';
 frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests`.
 
-**Arena iframe exception:** only when `KBRANDS_PREVIEW_EMBED=1`, E2B supplies a sandbox ID, the demo
-catalogue is on and live commerce is off, `next.config.ts` omits `X-Frame-Options` (even `SAMEORIGIN`
+**Arena iframe exception:** only when E2B supplies a sandbox ID, the demo catalogue is on and live
+commerce is off (and `KBRANDS_PREVIEW_EMBED` is not `0`), `next.config.ts` omits `X-Frame-Options`
+(even `SAMEORIGIN`
 would block a cross-site iframe) and changes CSP's `frame-ancestors` to `'self'`, `https://arena.ai`,
 `https://*.arena.ai`, `https://lmarena.ai`, `https://*.lmarena.ai`. It never opens framing to `*`.
 CSP stays enabled in this mode even if the local-debug `KBRANDS_DISABLE_CSP=1` is set, because without

@@ -21,7 +21,7 @@ function inspect(overrides: Record<string, string | null>): Snapshot {
   const childEnv: NodeJS.ProcessEnv = { ...process.env };
   for (const [key, value] of Object.entries({
     NODE_ENV: 'production',
-    KBRANDS_PREVIEW_EMBED: '1',
+    KBRANDS_PREVIEW_EMBED: null,
     KBRANDS_DEMO_CATALOGUE: '1',
     KBRANDS_LIVE_COMMERCE: '0',
     KBRANDS_DISABLE_CSP: null,
@@ -69,19 +69,19 @@ function assertLocked(s: Snapshot) {
 }
 
 test('the default production build remains unframeable, even if someone sets the preview switch', () => {
-  assertLocked(inspect({ KBRANDS_DEMO_CATALOGUE: null }));
+  assertLocked(inspect({ KBRANDS_DEMO_CATALOGUE: null, KBRANDS_PREVIEW_EMBED: '1' }));
 });
 
 test('live commerce closes the frame exception even if the other switches are left on', () => {
   assertLocked(inspect({ KBRANDS_LIVE_COMMERCE: '1' }));
 });
 
-test('a demo outside E2B, or without explicit opt-in, remains unframeable', () => {
-  assertLocked(inspect({ E2B_SANDBOX_ID: null }));
-  assertLocked(inspect({ KBRANDS_PREVIEW_EMBED: null }));
+test('a demo outside E2B cannot force embedding; an E2B demo can explicitly opt out', () => {
+  assertLocked(inspect({ E2B_SANDBOX_ID: null, KBRANDS_PREVIEW_EMBED: '1' }));
+  assertLocked(inspect({ KBRANDS_PREVIEW_EMBED: '0' }));
 });
 
-test('only an opted-in, non-live E2B demo allows Arena framing and partitioned HTTPS cookies', () => {
+test('a non-live E2B demo permits Arena framing and partitioned HTTPS cookies by default', () => {
   const s = inspect({ KBRANDS_DISABLE_CSP: '1' });
   assert.equal(s.enabled, true);
   assert.equal(s.xfo, null, 'DENY and SAMEORIGIN would both override CSP and break the iframe');
